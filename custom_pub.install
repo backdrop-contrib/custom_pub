@@ -1,0 +1,14 @@
+<?php
+//;$Id$
+
+/**
+ * Implementation of hook_uninstall()
+ */
+function custom_pub_uninstall() {
+	$types = variable_get('custom_pub_types', array());
+	$ret=array();
+	foreach ($types as $type => $name) {
+		db_drop_field($ret,'node',$type);
+	}
+	variable_del('custom_pub_types');
+}

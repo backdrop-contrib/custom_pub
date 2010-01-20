@@ -1,0 +1,5 @@
+;$Id: $
+name=Custom Publishing Options
+description=Adds the abilty to add Custom publishing options to the node Add/Edit form.
+core=6.x
+package=Other
