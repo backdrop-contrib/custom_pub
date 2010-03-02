@@ -45,7 +45,7 @@ function custom_pub_admin() {
 		$rows[] = array('data'=>$form_row,'class'=>'custom_pub-form-edit');
 	}
 	if ($rows) {
-		$table = theme('table',array('Label','Machine Name',array('data'=>'','class'=>'custom_pub-head-edit')),$rows);
+		$table = theme('table',array(t('Label'),t('Machine Name'),array('data'=>'','class'=>'custom_pub-head-edit')),$rows);
 		//generate the table for the current options
 	}
 	return $table . drupal_get_form('custom_pub_add');
@@ -140,10 +140,10 @@ function custom_pub_add_submit($form,$form_state) {
 	db_add_field($ret,'node',trim($form_state['values']['state_machine']),$spec);
 	if ($ret[0]['success']){
 		variable_set('custom_pub_types',array_merge($types,$type));
-		drupal_set_message('Publishing option created.');
+		drupal_set_message(t('Publishing option created.'));
 	}
 	else {
-		drupal_set_message('There was an error creating your Publishing option.','error');
+		drupal_set_message(t('There was an error creating your Publishing option.'),'error');
 	}
 }
 
@@ -354,7 +354,7 @@ function custom_pub_schema_alter(&$schema) {
 	$types = variable_get('custom_pub_types', array());
 	foreach ($types as $type => $name) {
 		$schema['node']['fields'][$type] = array(
-        'description' => 'Custom publishing option '.$name,
+        'description' => t('Custom publishing option %name',array('%name' => $name)),
         'type' => 'int',
         'not null' => TRUE,
         'default' => 0);
