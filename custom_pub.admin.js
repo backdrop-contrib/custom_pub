@@ -1,4 +1,3 @@
-/* $Id$ */
 Drupal.behaviors.custom_pub_admin = function() {
 	$("td.custom_pub-option-edit-cell").html('<a href="#">Edit</a>').css("text-align","right");
 	$("tr.custom_pub-form-edit").hide();
