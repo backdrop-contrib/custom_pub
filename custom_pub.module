@@ -354,7 +354,7 @@ function custom_pub_schema_alter(&$schema) {
 	$types = variable_get('custom_pub_types', array());
 	foreach ($types as $type => $name) {
 		$schema['node']['fields'][$type] = array(
-        'description' => t('Custom publishing option %name',array('%name' => $name)),
+        'description' => t('Custom publishing option @name',array('@name' => $name)),
         'type' => 'int',
         'not null' => TRUE,
         'default' => 0);
