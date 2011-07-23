@@ -1,7 +1,10 @@
 <?php
-
 /**
- * Implementation of hook_uninstall()
+ * @file
+ * Install and update function for Custom pub
+ */
+/**
+ * Implements hook_uninstall()
  */
 function custom_pub_uninstall() {
 	$types = variable_get('custom_pub_types', array());
@@ -10,4 +13,25 @@ function custom_pub_uninstall() {
 		db_drop_field($ret,'node',$type);
 	}
 	variable_del('custom_pub_types');
+  variable_del('custom_pub_node_types');
+}
+
+/**
+ * Implements hook_update_N()
+ */
+function custom_pub_update_6120() {
+  $types = variable_get('custom_pub_types', array());
+  $node_types = variable_get('custom_pub_node_types', array());
+  foreach ($types as $type => $name) {
+    $new_types[$type]['type'] = $type;
+    $new_types[$type]['name'] = $name;
+  }
+  foreach ($node_types as $node_type => $types_on) {
+    foreach($types_on as $type => $name) {
+      $new_types[$type]['node_types'][$node_type] = TRUE;
+    }
+  }
+  variable_set('custom_pub_types', $new_types);
+  variable_del('custom_pub_node_types');
+ 
 }
