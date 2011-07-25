@@ -14,6 +14,10 @@ function custom_pub_help($path, $arg) {
 
 /**
  * Implements hook_perm()
+ * 
+ * We use these permissions on the inidvidual elements in the
+ * node_form via the #access parameter. So in order to use the elements
+ * you must add the permissions to a role.
  */
 function custom_pub_perm() {
   $types = variable_get('custom_pub_types', array());
@@ -24,9 +28,22 @@ function custom_pub_perm() {
 }
 
 /**
+ * Implements hook_theme()
+ */
+function custom_pub_theme() {
+  return array(
+    'custom_pub_edit_form' => array(
+      'file' => 'theme.inc',
+      'path' => drupal_get_path('module', 'custom_pub'),
+      'arguments' => array('form' => array()),
+    ),
+  );
+}
+
+/**
  * Implements hook_menu()
  */
-function custom_pub_menu(){
+function custom_pub_menu() {
 	$items['admin/content/custom_pub'] = array(
 		'title' => 'Publishing Options',
 		'page callback' => 'custom_pub_admin',
@@ -54,7 +71,7 @@ function custom_pub_admin() {
 		$row = array($type['name'], $type['type'], $types_of_nodes, array('data'=>'','class'=>'custom_pub-option-edit-cell'));
 		$form_row[] = array(
 		  'data'=>drupal_get_form('custom_pub_edit_'.$type['type'], $type),
-		  'colspan'=>3,
+		  'colspan'=>4,
 		);
 		$rows[] = array('data'=>$row,'class'=>'custom_pub-option-row');
 		$rows[] = array('data'=>$form_row,'class'=>'custom_pub-form-edit');
@@ -191,37 +208,34 @@ function custom_pub_edit(&$form_state, $type) {
 		'#type' => 'value',
 		'#value' => $type,
 	);
-	$form['fs'] = array(
-		'#type' => 'fieldset',
-		'#title' => t('Edit') . ' ' . $type['name']
-	);
-	$form['fs']['state'] = array(
+	$form['state'] = array(
   	'#title' => t('Publishing label'),
 		'#type' => 'textfield',
 		'#maxlength' => 255,
 		'#size' => 100,
 		'#default_value' => $type['name'],
 	);
-  $form['fs']['node_types'] = array(
+  $form['node_types'] = array(
     '#type' => 'checkboxes',
     '#title' => t('Available on'),
     '#description' => t('The Node Types this option is available on.'),
     '#options' => $types,
     '#default_value' => array_keys($type['node_types']),
   );
-	$form['fs']['stateh'] = array(
+	$form['stateh'] = array(
     '#type' => 'hidden',
     '#value' => $type['type'],
 	);
-	$form['fs']['save'] = array(
+	$form['save'] = array(
 		'#type' => 'submit',
 		'#value' => t('Save'),
 	);
-	$form['fs']['delete'] = array(
+	$form['delete'] = array(
 		'#type' => 'submit',
 		'#value' => t('Delete'),
 		'#attributes' => array('id'=>'edit-delete'),
 	);
+  $form['#theme'][] = 'custom_pub_edit_form';
 	$form['#validate'][] = 'custom_pub_edit_validate';
 	$form['#submit'][] = 'custom_pub_edit_submit';
 	return $form;
@@ -289,6 +303,7 @@ function custom_pub_form_alter(&$form, $form_state, $form_id) {
     		  '#type' => 'checkbox',
     		  '#title' => t($type['name']),
     		  '#default_value' => $node->$type['type'],
+    		  '#access' => user_access('administer nodes') ? TRUE : user_access('toggle ' . $type['type'] . ' custom options'),
 			  );
       }
 		}

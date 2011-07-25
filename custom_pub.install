@@ -14,6 +14,7 @@ function custom_pub_uninstall() {
 	}
 	variable_del('custom_pub_types');
   variable_del('custom_pub_node_types');
+  return $ret;
 }
 
 /**
@@ -33,5 +34,24 @@ function custom_pub_update_6120() {
   }
   variable_set('custom_pub_types', $new_types);
   variable_del('custom_pub_node_types');
- 
+  return array();
+}
+
+/**
+ * Implements hook_update_N()
+ */
+function custom_pub_update_6130() {
+  $types = variable_get('custom_pub_types', array());
+  $node_types = node_get_types();
+  foreach ($types as $type) {
+    foreach ($node_types as $node_type) {
+      if (!empty($type['node_types'][$node_type->type])) {
+        $type['node_types'][$node_type->type] = $node_type->name;
+      }
+    }
+    $types[$type['type']] = $type;
+  }
+  variable_set('custom_pub_types', $types);
+  drupal_set_message('Updated Custom Publishing Options');
+  return array();
 }
