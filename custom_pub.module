@@ -418,28 +418,119 @@ function custom_pub_schema_alter(&$schema) {
  * Implementation of hook_action_info().
  */
 function custom_pub_action_info() {
-  $types = variable_get('custom_pub_types', array());
-  foreach ($types as $type) {
-    $actions["custom_pub_{$type['type']}_on_action"] = array(
-      'type' => 'node',
-      'description' => t('Toggle ' . $type['name'] . ' on'),
-      'configurable' => FALSE,
-      'behavior' => array('changes_node_property'),
-      'hooks' => array(
-        'nodeapi' => array('presave'),
-        'comment' => array('insert', 'update'),
-      ),
-    );
-    $actions["custom_pub_{$type['type']}_off_action"] = array(
-      'type' => 'node',
-      'description' => t('Toggle ' . $type['name'] . ' off'),
-      'configurable' => FALSE,
-      'behavior' => array('changes_node_property'),
-      'hooks' => array(
-        'nodeapi' => array('presave'),
-        'comment' => array('delete', 'insert', 'update'),
-      ),
-    );
-  }
+  $actions["custom_pub_on_action"] = array(
+    'type' => 'node',
+    'description' => t('Toggle a Custom Publishing Option on'),
+    'configurable' => TRUE,
+    'behavior' => array('changes_node_property'),
+    'hooks' => array(
+      'nodeapi' => array('presave'),
+      'comment' => array('insert', 'update'),
+    ),
+  );
+  $actions["custom_pub_off_action"] = array(
+    'type' => 'node',
+    'description' => t('Toggle a Custom Publishing Option off'),
+    'configurable' => TRUE,
+    'behavior' => array('changes_node_property'),
+    'hooks' => array(
+      'nodeapi' => array('presave'),
+      'comment' => array('delete', 'insert', 'update'),
+    ),
+  );
+
   return $actions;   
-}    
+}
+
+/**
+ * Implements a configurable action
+ * Toggles a custom publishing option on as an action
+ * 
+ * @param $node
+ *   The node object of the current node
+ * 
+ * @param $context
+ *   The avaialable context of the current action
+ */
+function custom_pub_on_action(&$node, &$context) {
+  //This is mainly for the Rules Module. I couldn't get a node to save unless I set this manually
+  $context['auto_save'] = TRUE;
+  $types = variable_get('custom_pub_types', array());
+  foreach ($context['types'] as $type) {
+    if (!empty($type) && in_array($node->type, array_keys($types[$type]['node_types']))) {
+      $node->$type = 1;
+      watchdog('action', 'Toggled @type %title custom publishing option: @label to on.', array('@type' => node_get_types('name', $node), '%title' => $node->title, '@label' => $types[$type]['name']));
+    }
+  }
+}
+
+/**
+ * Implements a configurable action form
+ * Allows the user to pick custom publishing options to turn on.
+ */
+function custom_pub_on_action_form($context) {
+  $types = variable_get('custom_pub_types', array());//get the current custom publishing types
+  foreach ($types as $type) {
+    $pub_types[$type['type']] = $type['name'];
+  }
+  $form['types'] = array(
+    '#title' => t('Custom Publishing Options'),
+    '#description' => t('Select the Custom publishing options to toggle on when this action is triggered.'),
+    '#type' => 'checkboxes',
+    '#options' => $pub_types,
+    '#default_value' => isset($context['types']) ? $context['types'] : array(),
+  );
+  
+  return $form;
+}
+
+function custom_pub_on_action_submit($form, $form_state) {
+  return array('types' => $form_state['values']['types']);
+}
+
+/**
+ * Implements a configurable action
+ * Toggles a custom publishing option off as an action
+ * 
+ * @param $node
+ *   The node object of the current node
+ * 
+ * @param $context
+ *   The avaialable context of the current action
+ */
+function custom_pub_off_action(&$node, $context) {
+  //This is mainly for the Rules Module. I couldn't get a node to save unless I set this manually
+  $context['auto_save'] = TRUE;
+  $types = variable_get('custom_pub_types', array());
+  foreach ($context['types'] as $type) {
+    if (in_array($node->type, array_keys($types[$type]['node_types']))) {
+      $node->$type = 0;
+      watchdog('action', 'Toggled @type %title custom publishing option: @label to off.', array('@type' => node_get_types('name', $node), '%title' => $node->title, '@label' => $types[$type]['name']));
+    }
+  }
+  return array('node' => $node);
+}
+
+/**
+ * Implements a configurable action form
+ * Allows the user to pick custom publishing options to turn off.
+ */
+function custom_pub_off_action_form($context) {
+  $types = variable_get('custom_pub_types', array());//get the current custom publishing types
+  foreach ($types as $type) {
+    $pub_types[$type['type']] = $type['name'];
+  }
+  $form['types'] = array(
+    '#title' => t('Custom Publishing Options'),
+    '#description' => t('Select the Custom publishing options to toggle off when this action is triggered.'),
+    '#type' => 'checkboxes',
+    '#options' => $pub_types,
+    '#default_value' => isset($context['types']) ? $context['types'] : array(),
+  );
+  
+  return $form;
+}
+
+function custom_pub_off_action_submit($form, $form_state) {
+  return array('types' => $form_state['values']['types']);
+}
