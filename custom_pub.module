@@ -1,19 +1,30 @@
 <?php
 
 /**
- * Implementation of hook_help().
+ * Implements hook_help().
  */
 function custom_pub_help($path, $arg) {
   switch ($path) {
     case 'admin/help#custom_pub':
       return '<p>'. t("Custom Publishing Options allows you to create custom publishing options for nodes. It allows you to add to the default options of Publish, Promote to Front Page, and Sticky. It also ingrates with views to allow you add as a field, sort and filter by, your custom options.") .'</p>';
-    case 'admin/settings/custom_pub':
+    case 'admin/content/custom_pub':
       return '<p>'. t("Custom Publishing Options allows you to create custom publishing options for nodes. It allows you to add to the default options of Publish, Promote to Front Page, and Sticky. It also ingrates with views to allow you add as a field, sort and filter by, your custom options.") .'</p>';
   }
 }
 
 /**
- * Implementation of hook_menu()
+ * Implements hook_perm()
+ */
+function custom_pub_perm() {
+  $types = variable_get('custom_pub_types', array());
+  foreach ($types as $type) {
+    $perms[] = 'toggle ' . $type['type'] . ' custom options';
+  }
+  return $perms;
+}
+
+/**
+ * Implements hook_menu()
  */
 function custom_pub_menu(){
 	$items['admin/content/custom_pub'] = array(
@@ -56,7 +67,7 @@ function custom_pub_admin() {
 }
 
 /**
- * Implementation of hook_forms()
+ * Implements hook_forms()
  */
 function custom_pub_forms($form_id, $args) {
 	//We need to use this hook because on the admin page there is the possiblity of multiple forms for the edit form. See http://drupal.org/node/354519
@@ -264,7 +275,7 @@ function custom_pub_edit_submit($form,$form_state) {
 }
 
 /**
- * Implementation of hook_form_alter()
+ * Implements hook_form_alter()
  */
 function custom_pub_form_alter(&$form, $form_state, $form_id) {
 
@@ -352,7 +363,7 @@ function custom_pub_node_fiter_submit ($form,$form_state) {
 }
 
 /**
- * Implementation of hook_nodeapi()
+ * Implements hook_nodeapi()
  */
 function custom_pub_nodeapi(&$node, $op) {
 	$types = variable_get('custom_pub_types', array());
@@ -368,7 +379,7 @@ function custom_pub_nodeapi(&$node, $op) {
 }
 
 /**
- * Implementation of hook_views_data_alter()
+ * Implements hook_views_data_alter()
  */
 function custom_pub_views_data_alter(&$data){
 	$types = variable_get('custom_pub_types', array());
@@ -401,7 +412,7 @@ function custom_pub_views_data_alter(&$data){
 }
 
 /**
- * Implementation of hook_schema_alter()
+ * Implements hook_schema_alter()
  */
 function custom_pub_schema_alter(&$schema) {
 	$types = variable_get('custom_pub_types', array());
@@ -415,7 +426,7 @@ function custom_pub_schema_alter(&$schema) {
 }
 
 /**
- * Implementation of hook_action_info().
+ * Implements hook_action_info().
  */
 function custom_pub_action_info() {
   $actions["custom_pub_on_action"] = array(
