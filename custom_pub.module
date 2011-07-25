@@ -498,7 +498,7 @@ function custom_pub_on_action_submit($form, $form_state) {
  * @param $context
  *   The avaialable context of the current action
  */
-function custom_pub_off_action(&$node, $context) {
+function custom_pub_off_action(&$node, &$context) {
   //This is mainly for the Rules Module. I couldn't get a node to save unless I set this manually
   $context['auto_save'] = TRUE;
   $types = variable_get('custom_pub_types', array());
