@@ -42,9 +42,9 @@ function custom_pub_update_6120() {
  */
 function custom_pub_update_6130() {
   $types = variable_get('custom_pub_types', array());
-  $node_types = node_get_types();
+  $node_types = _node_types_build();
   foreach ($types as $type) {
-    foreach ($node_types as $node_type) {
+    foreach ($node_types->types as $node_type) {
       if (!empty($type['node_types'][$node_type->type])) {
         $type['node_types'][$node_type->type] = $node_type->name;
       }
@@ -54,4 +54,30 @@ function custom_pub_update_6130() {
   variable_set('custom_pub_types', $types);
   drupal_set_message('Updated Custom Publishing Options');
   return array();
+}
+
+/**
+ * Implements hook_update_N()
+ */
+function custom_pub_update_7100() {
+  $types = variable_get('custom_pub_types', array());
+  $node_types = _node_types_build();
+  $node_types = array_keys($node_types);
+  $spec = array(
+    'description' => 'Custom publishing option '.t(trim($form_state['values']['state'])),
+    'type' => 'int',
+    'not null' => TRUE,
+    'default' => 0
+  );
+  foreach ($types as $type) {
+    foreach ($type['node_types'] as $n_type => $name) {
+      if (!in_array($n_type, $node_types)) {
+        unset($types[$type['type']]['node_types'][$n_type]);
+      }
+    }
+    if (!db_field_exists('node', $type['type'])) {
+      db_add_field('node', $type['type'], $spec);
+    }
+  }
+  variable_set('custom_pub_types', $types);
 }
