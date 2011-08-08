@@ -353,63 +353,86 @@ function custom_pub_form_alter(&$form, $form_state, $form_id) {
 		}
 	}
 	//We are altering the content list form so that we can add out custom options to the filters
-	if ($form_id == 'node_admin_content') {
-	  $types = variable_get('custom_pub_types', array());
-		$session = &$_SESSION['node_overview_filter'];
-		$session = is_array($session) ? $session : array();
-		$filters = node_filters();
-		foreach ($types as $type) {
-			$form['filters']['status']['status']['#options'][$type['type'].'-1']=t($type['name']);
-			$form['filters']['status']['status']['#options'][$type['type'].'-0']=t('not '.$type['name']);
-			$form['#submit'][] = 'custom_pub_node_fiter_submit';
-			$filters['status']['options'][$type['type'].'-1']=t($type['name']);
-			$filters['status']['options'][$type['type'].'-0']=t('not ' . $type['name']);
-		}
-
-		$form['filters']['current'] = array();
-		foreach ($session as $filter) {
-			list($type, $value) = $filter;
-			if ($type == 'category') {
-				// Load term name from DB rather than search and parse options array.
-				$value = module_invoke('taxonomy', 'get_term', $value);
-				$value = $value->name;
-			}
-			else if ($type == 'language') {
-				$value = empty($value) ? t('Language neutral') : module_invoke('locale', 'language_name', $value);
-			}
-			else {
-				$value = $filters[$type]['options'][$value];
-			}
-			if ($i++) {
-				$form['filters']['current'][] = array('#value' => t('<em>and</em> where <strong>%a</strong> is <strong>%b</strong>', array('%a' => $filters[$type]['title'], '%b' => $value)));
-			}
-			else {
-				$form['filters']['current'][] = array('#value' => t('<strong>%a</strong> is <strong>%b</strong>', array('%a' => $filters[$type]['title'], '%b' => $value)));
-			}
-			if (in_array($type, array('type', 'language'))) {
-				// Remove the option if it is already being filtered on.
-				unset($filters[$type]);
-			}
-		}
-	}
+ if($form_id == 'node_admin_content') {
+    module_load_include('inc', 'node', 'node.admin');
+    $types = variable_get('custom_pub_types', array());
+    $filters = node_filters();
+    foreach($types as $type) {
+      $form['filter']['filters']['status']['filters']['status']['#options'][$type['type'] . '-1'] = t($type['name']);
+      $form['filter']['filters']['status']['filters']['status']['#options'][$type['type'] . '-0'] = t('not ' . $type['name']);
+      $filters['status']['options'][$type['type'] . '-1'] = t($type['name']);
+      $filters['status']['options'][$type['type'] . '-0'] = t('not ' . $type['name']);
+    }
+    $kill_key = array_search('node_filter_form_submit');
+    unset($form['#submit'][$kill_key]);
+    $form['#submit'][] = 'custom_pub_node_fiter_submit';
+    $session = isset($_SESSION['node_overview_filter']) ? $_SESSION['node_overview_filter'] : array();
+    dpm($session);
+    #dpm($filters);
+    $i = 0;
+    //We have to kill the current filters description so we can rebuild it with ours
+    unset($form['filters']['current']);
+    foreach($session as $filter) {
+      list($type, $value) = $filter;
+      if($type == 'term') {
+        // Load term name from DB rather than search and parse options array.
+        $value = module_invoke('taxonomy', 'term_load', $value);
+        $value = $value->name;
+      } elseif($type == 'language') {
+        $value = $value == LANGUAGE_NONE ? t('Language neutral') : module_invoke('locale', 'language_name', $value);
+      }
+      else {
+        $value = $filters[$type]['options'][$value];
+      }
+      $t_args = array('%property' => $filters[$type]['title'],
+        '%value' => $value);
+      if($i++) {
+        $form['filters']['current'][] = array('#markup' => t('and where %property is %value', $t_args));
+      }
+      else {
+        $form['filters']['current'][] = array('#markup' => t('where %property is %value', $t_args));
+      }
+      if(in_array($type, array('type',
+        'language'))) {
+        // Remove the option if it is already being filtered on.
+        unset( $form['filter']['filters']['status']['filters']['status']['#options'][$type]);
+      }
+    }
+  }
 }
 
 /**
  * Form submit function for node_admin_content
  */
-function custom_pub_node_fiter_submit ($form,$form_state) {
-	$types = variable_get('custom_pub_types', array());
-	switch ($form_state['values']['op']) {
+function custom_pub_node_fiter_submit ($form, $form_state) {
+  $types = variable_get('custom_pub_types', array());
+  $filters = node_filters();
+  switch ($form_state['values']['op']) {
 		case t('Filter'):
 		case t('Refine'):
-			if (isset($form_state['values']['filter'])) {
-				$filter = $form_state['values']['filter'];
-				list($type, $val) = explode('-',$form_state['values'][$filter]);
-				if (isset($types[$type])) {
-					$_SESSION['node_overview_filter'][] = array($filter, $form_state['values'][$filter]);
-				}
-			}
+      // Apply every filter that has a choice selected other than 'any'.
+      foreach ($filters as $filter => $options) {
+        $custom = FALSE;
+        if (isset($form_state['values'][$filter]) && $form_state['values'][$filter] != '[any]') {
+          // Flatten the options array to accommodate hierarchical/nested options.
+          $flat_options = form_options_flatten($filters[$filter]['options']);
+          // Only accept valid selections offered on the dropdown, block bad input.
+          if ($filter == 'status') {
+            list($type, $val) = explode('-',$filter);
+            $custom = isset($types[$type]);
+          }
+          if (isset($flat_options[$form_state['values'][$filter]]) || $custom) {
+            $_SESSION['node_overview_filter'][] = array($filter, $form_state['values'][$filter]);
+          }
+        }
+      }
 			break;
+    case t('Undo'):
+      array_pop($_SESSION['node_overview_filter']);
+      break;
+    case t('Reset'):
+      $_SESSION['node_overview_filter'] = array();
+      break;
 	}
 }
 
@@ -601,9 +624,11 @@ function custom_pub_node_prepare($node) {
   // If this is a new node, fill in the default values.
   if (!isset($node->nid)) {
     $node_options = variable_get('node_options_'. $node->type, array('status', 'promote'));
-    foreach ($types as $key => $value) {
-      $node->$key = in_array($key, $node_options);
-    };
+    foreach (array_keys($types) as $key) {
+      if(!isset($node->$key)) {
+        $node->$key = in_array($key, $node_options);
+      }
+    }
   }
 }
 
