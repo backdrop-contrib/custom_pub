@@ -13,16 +13,19 @@ function custom_pub_help($path, $arg) {
 }
 
 /**
- * Implements hook_perm()
+ * Implements hook_permissions()
  * 
  * We use these permissions on the inidvidual elements in the
  * node_form via the #access parameter. So in order to use the elements
  * you must add the permissions to a role.
  */
-function custom_pub_perm() {
+function custom_pub_permissions() {
   $types = variable_get('custom_pub_types', array());
   foreach ($types as $type) {
-    $perms[] = 'toggle ' . $type['type'] . ' custom options';
+    $key = 'edit_custom_pub_' . $type['type'];
+    $perms[$key] = array(
+      'title' => 'Toggle ' . $type['type'] . ' custom options'
+    );
   }
   return $perms;
 }
@@ -35,7 +38,7 @@ function custom_pub_theme() {
     'custom_pub_edit_form' => array(
       'file' => 'theme.inc',
       'path' => drupal_get_path('module', 'custom_pub'),
-      'arguments' => array('form' => array()),
+      'render element' => 'form',
     ),
   );
 }
@@ -44,7 +47,7 @@ function custom_pub_theme() {
  * Implements hook_menu()
  */
 function custom_pub_menu() {
-	$items['admin/content/custom_pub'] = array(
+	$items['admin/structure/custom_pub'] = array(
 		'title' => 'Publishing Options',
 		'page callback' => 'custom_pub_admin',
 		'access arguments' => array('administer nodes'),
@@ -68,16 +71,26 @@ function custom_pub_admin() {
     if (is_array($type['node_types'])) {
       $types_of_nodes = implode(', ', $type['node_types']); 
     }
-		$row = array($type['name'], $type['type'], $types_of_nodes, array('data'=>'','class'=>'custom_pub-option-edit-cell'));
+		$row = array($type['name'], $type['type'], $types_of_nodes, array('data' => '','class' => array('custom_pub-option-edit-cell')));
 		$form_row[] = array(
-		  'data'=>drupal_get_form('custom_pub_edit_'.$type['type'], $type),
-		  'colspan'=>4,
+		  'data'=> render(drupal_get_form('custom_pub_edit_'.$type['type'], $type)),
+		  'colspan'=> 4,
+		  'class' => array('custom_pub-form-edit'),
 		);
-		$rows[] = array('data'=>$row,'class'=>'custom_pub-option-row');
-		$rows[] = array('data'=>$form_row,'class'=>'custom_pub-form-edit');
+		$rows[] = array('data' => $row, 'class' => array('custom_pub-option-row'));
+		$rows[] = array('data' => $form_row, 'class' => array('custom_pub-form-edit'));
 	}
 	if (!empty($rows)) {
-		$table = theme('table',array(t('Label'),t('Machine Name'),t('Node Types'),array('data'=>'','class'=>'custom_pub-head-edit')),$rows);
+	  $vars = array(
+	     'header' => array(
+	       t('Label'),
+	       t('Machine Name'),
+	       t('Node Types'),
+	       array('data'=>'','class' => array('custom_pub-head-edit')),
+       ),
+	     'rows' => $rows
+     );
+		$table = theme('table', $vars);
 		//generate the table for the current options
 	}
 	return $table . render(drupal_get_form('custom_pub_add'));
@@ -193,7 +206,6 @@ function custom_pub_add_submit($form, &$form_state) {
     $success = TRUE;
   }
   catch (Exception $e){
-    dpm($e);
     $success = FALSE;
   }
 	if ($success){
@@ -245,6 +257,7 @@ function custom_pub_edit($form, &$form_state, $type) {
 		'#value' => t('Delete'),
 		'#attributes' => array('id'=>'edit-delete'),
 	);
+  
   $form['#theme'][] = 'custom_pub_edit_form';
 	$form['#validate'][] = 'custom_pub_edit_validate';
 	$form['#submit'][] = 'custom_pub_edit_submit';
@@ -307,33 +320,41 @@ function custom_pub_edit_submit($form, &$form_state) {
  * Implements hook_form_alter()
  */
 function custom_pub_form_alter(&$form, $form_state, $form_id) {
-
-	$types = variable_get('custom_pub_types', array());
 	//add the options to the node form
-	if ($form['#id'] === 'node-form') {
+	if (isset($form['#node_edit_form']) && $form['#node_edit_form'] === TRUE) {
 		$node = $form['#node'];
+    $types = custom_pub_by_node_type($node);
 		foreach ($types as $type) {
-		  if (!empty($type['node_types'][$node->type])) {
-			  $form['options'][$type['type']] = array(
-    		  '#type' => 'checkbox',
-    		  '#title' => t($type['name']),
-    		  '#default_value' => $node->$type['type'],
-    		  '#access' => user_access('administer nodes') ? TRUE : user_access('toggle ' . $type['type'] . ' custom options'),
-			  );
-      }
+			$form['options'][$type['type']] = array(
+    	 '#type' => 'checkbox',
+    	 '#title' => t($type['name']),
+    	 '#default_value' => $node->{$type['type']},
+    	 '#access' => user_access('administer nodes') ? TRUE : user_access('edit_custom_pub_' . $type['type']),
+			);
+      //If $access is already set to true we don't want to override it. Once it's TRUE then it should stay TRUE
+      //If it's not TRUE though then we should set it to the current access value
+      $access = empty($access) ? user_access('edit_custom_pub_' . $type['type']) : TRUE;
 		}
+    //If after we loop through the types there is at least one that is being set by a custom permission
+    //Then we need to alter the default asscess on the options tab and it's default options
+    if ($access) {
+      $form['options']['#access'] = $access;
+      $form['options']['status']['#access'] = 
+      $form['options']['promote']['#access'] =
+      $form['options']['sticky']['#access'] = user_access('administer nodes');
+    }
 	}
 	//Add options to the node_type_form for editing default node options
 	if ($form_id == 'node_type_form'){
 	  $node_type = $form['#node_type'];
+    $types = custom_pub_by_node_type($node_type);
 		foreach ($types as $type) {
-		 if (!empty($type['node_types'][$node_type->type])) { 
-		   $form['workflow']['node_options']['#options'][$type['type']] = t($type['name']);
-     }
+      $form['workflow']['node_options']['#options'][$type['type']] = t($type['name']);
 		}
 	}
 	//We are altering the content list form so that we can add out custom options to the filters
 	if ($form_id == 'node_admin_content') {
+	  $types = variable_get('custom_pub_types', array());
 		$session = &$_SESSION['node_overview_filter'];
 		$session = is_array($session) ? $session : array();
 		$filters = node_filters();
@@ -389,22 +410,6 @@ function custom_pub_node_fiter_submit ($form,$form_state) {
 				}
 			}
 			break;
-	}
-}
-
-/**
- * Implements hook_nodeapi()
- */
-function custom_pub_nodeapi(&$node, $op) {
-	$types = variable_get('custom_pub_types', array());
-	if($op == 'prepare'){
-		// If this is a new node, fill in the default values.
-		if (!isset($node->nid)) {
-			$node_options = variable_get('node_options_'. $node->type, array('status', 'promote'));
-			foreach ($types as $key => $value) {
-				$node->$key = in_array($key, $node_options);
-			};
-		}
 	}
 }
 
@@ -574,4 +579,54 @@ function custom_pub_off_action_form($context) {
 
 function custom_pub_off_action_submit($form, &$form_state) {
   return array('types' => $form_state['values']['types']);
+}
+
+/**
+ * Implements hook_query_TAG_alter()
+ */
+function custom_pub_query_node_load_multiple_alter($query) {
+  $types = variable_get('custom_pub_types', array());
+  if (count($types)) {
+    foreach ($types as $field => $types) {
+      $query->addField('base', $field);
+    }
+  }
+}
+
+/**
+ * Implements hook_node_prepare().
+ */
+function custom_pub_node_prepare($node) {
+  $types = custom_pub_by_node_type($node);
+  // If this is a new node, fill in the default values.
+  if (!isset($node->nid)) {
+    $node_options = variable_get('node_options_'. $node->type, array('status', 'promote'));
+    foreach ($types as $key => $value) {
+      $node->$key = in_array($key, $node_options);
+    };
+  }
+}
+
+/**
+ * Returns only the custom types available for the given node type
+ * 
+ * @param $type
+ *   Can be either a string of the node type or an object/array with a key of 'type'
+ * 
+ * @return
+ *   An array of the custom pub types that are avaialbe for that node->type
+ */
+function custom_pub_by_node_type($n_type) {
+  $return_types = array();
+  if (is_object($n_type) || is_array($n_type)) {
+    (object)$n_type;
+    $n_type = $n_type->type;
+  }
+  $types = variable_get('custom_pub_types', array());
+  foreach ($types as $key => $type) {
+    if (!empty($type['node_types'][$n_type])) {
+      $return_types[$key] = $type;
+    }
+  }
+  return $return_types;
 }
