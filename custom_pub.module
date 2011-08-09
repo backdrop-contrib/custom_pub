@@ -363,40 +363,31 @@ function custom_pub_form_alter(&$form, $form_state, $form_id) {
       $filters['status']['options'][$type['type'] . '-1'] = t($type['name']);
       $filters['status']['options'][$type['type'] . '-0'] = t('not ' . $type['name']);
     }
-    $kill_key = array_search('node_filter_form_submit');
+    $kill_key = array_search('node_filter_form_submit', $form['#submit']);
     unset($form['#submit'][$kill_key]);
     $form['#submit'][] = 'custom_pub_node_fiter_submit';
+    $form['filter']['filters']['current'] = array();
     $session = isset($_SESSION['node_overview_filter']) ? $_SESSION['node_overview_filter'] : array();
-    dpm($session);
-    #dpm($filters);
     $i = 0;
     //We have to kill the current filters description so we can rebuild it with ours
     unset($form['filters']['current']);
     foreach($session as $filter) {
       list($type, $value) = $filter;
-      if($type == 'term') {
-        // Load term name from DB rather than search and parse options array.
-        $value = module_invoke('taxonomy', 'term_load', $value);
-        $value = $value->name;
-      } elseif($type == 'language') {
+      if($type == 'language') {
         $value = $value == LANGUAGE_NONE ? t('Language neutral') : module_invoke('locale', 'language_name', $value);
       }
       else {
+        $orig_value = $value;
         $value = $filters[$type]['options'][$value];
       }
-      $t_args = array('%property' => $filters[$type]['title'],
-        '%value' => $value);
+      $t_args = array('%property' => $filters[$type]['title'], '%value' => $value);
       if($i++) {
-        $form['filters']['current'][] = array('#markup' => t('and where %property is %value', $t_args));
+        $form['filter']['filters']['current'][] = array('#markup' => t('and where %property is %value', $t_args));
       }
       else {
-        $form['filters']['current'][] = array('#markup' => t('where %property is %value', $t_args));
+        $form['filter']['filters']['current'][] = array('#markup' => t('where %property is %value', $t_args));
       }
-      if(in_array($type, array('type',
-        'language'))) {
-        // Remove the option if it is already being filtered on.
-        unset( $form['filter']['filters']['status']['filters']['status']['#options'][$type]);
-      }
+      unset($form['filter']['filters']['status']['filters']['status']['#options'][$orig_value]);
     }
   }
 }
