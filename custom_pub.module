@@ -321,6 +321,7 @@ function custom_pub_edit_submit($form, &$form_state) {
  */
 function custom_pub_form_alter(&$form, $form_state, $form_id) {
 	//add the options to the node form
+	$access = FALSE;
 	if (isset($form['#node_edit_form']) && $form['#node_edit_form'] === TRUE) {
 		$node = $form['#node'];
     $types = custom_pub_by_node_type($node);
