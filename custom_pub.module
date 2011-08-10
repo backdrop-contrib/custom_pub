@@ -74,6 +74,7 @@ function custom_pub_forms($form_id, $args) {
   foreach ($types as $type) {
     if ($form_id == 'custom_pub_edit_'.$type['type']) {
       $forms[$form_id] = array('callback' => 'custom_pub_edit');
+      return $forms;
     }
   }
   if ($form_id == 'node_admin_content') {
@@ -81,8 +82,8 @@ function custom_pub_forms($form_id, $args) {
     $forms['node_admin_content'] = array(
       'callback' => 'custom_pub_node_admin_content',
     );
+    return $forms;
   }
-  return $forms;
 }
 
 /**
