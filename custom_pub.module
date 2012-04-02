@@ -139,31 +139,32 @@ function custom_pub_form_alter(&$form, $form_state, $form_id) {
  */
 function custom_pub_views_data_alter(&$data){
   $types = variable_get('custom_pub_types', array());
-  $node_types = _node_types_build();
+  $node_types = node_type_get_types();
   foreach ($types as $type) {
-    $used_in = array();
-    foreach ($node_types->types as $node_type) {
-      if (!empty($type['node_types'][$node_type->type])) {
-        $used_in[] = $node_type->name;
-      }
-    }
-    // published status
-    $data['node'][$type['type']] = array(
-    'title' => t($type['name']),
-    'help' => t('Custom Publishing Option. Appears in: !types', array('!types' => implode(', ', $used_in))),
-    'field' => array(
-      'handler' => 'views_handler_field_boolean',
-      'click sortable' => TRUE,
-    ),
-    'filter' => array(
-      'handler' => 'views_handler_filter_boolean_operator',
-      'label' => t($type['name']),
-      'type' => 'yes-no',
-    ),
-    'sort' => array(
-      'handler' => 'views_handler_sort',
-    ),
-    );
+   $used_in = array();
+   foreach ($node_types as $node_type) {
+     if (!empty($type['node_types'][$node_type->type])) {
+       $used_in[] = $node_type->name;
+     }
+   }
+   
+   // published status
+   $data['node'][$type['type']] = array(
+     'title' => t($type['name']),
+     'help' => t('Custom Publishing Option. Appears in: !types', array('!types' => implode(', ', $used_in))),
+     'field' => array(
+       'handler' => 'views_handler_field_boolean',
+       'click sortable' => TRUE,
+     ),
+     'filter' => array(
+       'handler' => 'views_handler_filter_boolean_operator',
+       'label' => t($type['name']),
+       'type' => 'yes-no',
+     ),
+     'sort' => array(
+       'handler' => 'views_handler_sort',
+     ),
+   );
   }
 }
 
