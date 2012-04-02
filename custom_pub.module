@@ -6,14 +6,14 @@
 function custom_pub_help($path, $arg) {
   switch ($path) {
     case 'admin/help#custom_pub':
-      return '<p>'. t("Custom Publishing Options allows you to create custom publishing options for nodes. It allows you to add to the default options of Publish, Promote to Front Page, and Sticky. It also ingrates with views to allow you add as a field, sort and filter by, your custom options.") .'</p>';
+      return '<p>' . t("Custom Publishing Options allows you to create custom publishing options for nodes. It allows you to add to the default options of Publish, Promote to Front Page, and Sticky. It also ingrates with views to allow you add as a field, sort and filter by, your custom options.") . '</p>';
     case 'admin/content/custom_pub':
-      return '<p>'. t("Custom Publishing Options allows you to create custom publishing options for nodes. It allows you to add to the default options of Publish, Promote to Front Page, and Sticky. It also ingrates with views to allow you add as a field, sort and filter by, your custom options.") .'</p>';
+      return '<p>' . t("Custom Publishing Options allows you to create custom publishing options for nodes. It allows you to add to the default options of Publish, Promote to Front Page, and Sticky. It also ingrates with views to allow you add as a field, sort and filter by, your custom options.") . '</p>';
   }
 }
 
 /**
- * Implements hook_permissions()
+ * Implements hook_permissions().
  * 
  * We use these permissions on the inidvidual elements in the
  * node_form via the #access parameter. So in order to use the elements
@@ -72,13 +72,13 @@ function custom_pub_forms($form_id, $args) {
   //We need to use this hook because on the admin page there is the possiblity of multiple forms for the edit form. See http://drupal.org/node/354519
   $types = variable_get('custom_pub_types', array());
   foreach ($types as $type) {
-    if ($form_id == 'custom_pub_edit_'.$type['type']) {
+    if ($form_id == 'custom_pub_edit_' . $type['type']) {
       $forms[$form_id] = array('callback' => 'custom_pub_edit');
       return $forms;
     }
   }
   if ($form_id == 'node_admin_content') {
-    module_load_include('inc','node', 'node.admin');
+    module_load_include('inc', 'node', 'node.admin');
     $forms['node_admin_content'] = array(
       'callback' => 'custom_pub_node_admin_content',
     );
@@ -98,7 +98,7 @@ function custom_pub_form_alter(&$form, $form_state, $form_id) {
     foreach ($types as $type) {
       $form['options'][$type['type']] = array(
        '#type' => 'checkbox',
-       '#title' => t($type['name']),
+       '#title' => check_plain($type['name']),
        '#default_value' => $node->{$type['type']},
        '#access' => user_access('administer nodes') ? TRUE : user_access('edit_custom_pub_' . $type['type']),
       );
@@ -116,7 +116,7 @@ function custom_pub_form_alter(&$form, $form_state, $form_id) {
     }
   }
   //Add options to the node_type_form for editing default node options
-  if ($form_id == 'node_type_form'){
+  if ($form_id == 'node_type_form') {
     $node_type = $form['#node_type'];
     $types = custom_pub_by_node_type($node_type);
     foreach ($types as $type) {
@@ -137,7 +137,7 @@ function custom_pub_form_alter(&$form, $form_state, $form_id) {
 /**
  * Implements hook_views_data_alter()
  */
-function custom_pub_views_data_alter(&$data){
+function custom_pub_views_data_alter(&$data) {
   $types = variable_get('custom_pub_types', array());
   $node_types = node_type_get_types();
   foreach ($types as $type) {
@@ -169,13 +169,13 @@ function custom_pub_views_data_alter(&$data){
 }
 
 /**
- * Implements hook_schema_alter()
+ * Implements hook_schema_alter().
  */
 function custom_pub_schema_alter(&$schema) {
   $types = variable_get('custom_pub_types', array());
   foreach ($types as $type) {
     $schema['node']['fields'][$type['type']] = array(
-      'description' => t('Custom publishing option @name',array('@name' => $type['name'])),
+      'description' => t('Custom publishing option @name', array('@name' => $type['name'])),
       'type' => 'int',
       'not null' => TRUE,
       'default' => 0,
@@ -323,9 +323,9 @@ function custom_pub_node_prepare($node) {
   $types = custom_pub_by_node_type($node);
   // If this is a new node, fill in the default values.
   if (!isset($node->nid)) {
-    $node_options = variable_get('node_options_'. $node->type, array('status', 'promote'));
+    $node_options = variable_get('node_options_' . $node->type, array('status', 'promote'));
     foreach (array_keys($types) as $key) {
-      if(!isset($node->$key)) {
+      if (!isset($node->$key)) {
         $node->$key = in_array($key, $node_options);
       }
     }
