@@ -16,8 +16,8 @@ function custom_pub_admin() {
     // Build table rows for the
     $form_row = array();
     $types_of_nodes = '';
-    if (is_array($type['node_types'])) {
-      $types_of_nodes = implode(', ', $type['node_types']); 
+    if (isset($type['node_types']) && is_array($type['node_types'])) {
+      $types_of_nodes = implode(', ', $type['node_types']);
     }
     $row = array($type['name'], $type['type'], $types_of_nodes, array('data' => '','class' => array('custom_pub-option-edit-cell')));
     $form_row[] = array(
@@ -174,7 +174,7 @@ function custom_pub_edit($form, &$form_state, $type) {
     '#title' => t('Available on'),
     '#description' => t('The Node Types this option is available on.'),
     '#options' => $types,
-    '#default_value' => array_keys($type['node_types']),
+    '#default_value' => isset($type['node_types']) ? array_keys($type['node_types']) : array(),
   );
   $form['stateh'] = array(
     '#type' => 'hidden',
@@ -189,7 +189,7 @@ function custom_pub_edit($form, &$form_state, $type) {
     '#value' => t('Delete'),
     '#attributes' => array('id'=>'edit-delete'),
   );
-  
+
   $form['#theme'][] = 'custom_pub_edit_form';
   $form['#validate'][] = 'custom_pub_edit_validate';
   $form['#submit'][] = 'custom_pub_edit_submit';
@@ -217,7 +217,8 @@ function custom_pub_edit_submit($form, &$form_state) {
   $node_types = _node_types_build();
   $type = $form_state['values']['type'];
   $types = variable_get('custom_pub_types', array());
-  if ($form_state['values']['op'] == 'Delete') {
+
+  if ($form_state['values']['op'] == t('Delete')) {
     unset($types[$type['type']]);
     $ret = array();
     try {
@@ -270,7 +271,7 @@ function custom_pub_node_admin_content($form, $form_state) {
 
 /**
  * Return form for node administration filters.
- * 
+ *
  * The main difference between this function and the base function is the drupal_alter call after node_filters
  */
 function custom_pub_node_filter_form() {
