@@ -107,17 +107,20 @@ function custom_pub_form_alter(&$form, $form_state, $form_id) {
       );
       //If $access is already set to true we don't want to override it. Once it's TRUE then it should stay TRUE
       //If it's not TRUE though then we should set it to the current access value
-      $access = empty($access) ? user_access('edit_custom_pub_' . $type['type']) : TRUE;
+      $access = !$access ? user_access('edit_custom_pub_' . $type['type']) : TRUE;
     }
-    //If after we loop through the types there is at least one that is being set by a custom permission
-    //Then we need to alter the default asscess on the options tab and it's default options
-    if ($access) {
-      $form['options']['#access'] = $access;
-      $form['options']['status']['#access'] =
-      $form['options']['promote']['#access'] =
-      $form['options']['sticky']['#access'] = user_access('administer nodes');
-    }
+
+    $form['options']['#access'] = $access;
+
+    if (!$access) {
+     foreach ($form['options'] as $option) {
+       if (isset($option['#access']) && $option['#access']) {
+        $form['options']['#access'] = TRUE;
+       }
+     }
+   }
   }
+
   //Add options to the node_type_form for editing default node options
   if ($form_id == 'node_type_form') {
     $node_type = $form['#node_type'];
@@ -126,12 +129,9 @@ function custom_pub_form_alter(&$form, $form_state, $form_id) {
       $form['workflow']['node_options']['#options'][$type['type']] = t($type['name']);
     }
   }
+
   if ($form_id == 'node_admin_content') {
     if (isset($form_state['values']['operation']) && $form_state['values']['operation'] == 'delete') {
-      //Kind of dumb that we have to do this here but because of the way we call our form and include the node.admin file
-      //We have no choice because on delete operations we end up losing control of the the form
-      //But we then get it back when the confirm button is pressed leaving us with out the required file loaded
-      //Thats why we add a submit handler to the start that then loads the file needed and then the node submit handler can work
       array_unshift($form['#submit'], 'custom_pub_node_admin_inc_add');
     }
   }
