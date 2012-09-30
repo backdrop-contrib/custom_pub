@@ -13,21 +13,24 @@ function custom_pub_help($path, $arg) {
 }
 
 /**
- * Implements hook_permissions().
+ * Implements hook_permission().
  *
- * We use these permissions on the inidvidual elements in the
+ * We use these permissions on the individual elements in the
  * node_form via the #access parameter. So in order to use the elements
  * you must add the permissions to a role.
  */
-function custom_pub_permissions() {
+function custom_pub_permission() {
+  $permissions = array();
+
   $types = variable_get('custom_pub_types', array());
   foreach ($types as $type) {
     $key = 'edit_custom_pub_' . $type['type'];
-    $perms[$key] = array(
-      'title' => 'Toggle ' . $type['type'] . ' custom options'
+    $permissions[$key] = array(
+      'title' => 'Can access/use ' . t('%type', array('%type' => $type['type'])) . ' custom publishing option on node forms'
     );
   }
-  return $perms;
+
+  return $permissions;
 }
 
 /**
