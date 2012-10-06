@@ -1,4 +1,6 @@
-name=Custom Publishing Options
-description=Adds the abilty to add Custom publishing options to the node Add/Edit form.
-core=7.x
-package=Other
+name = Custom Publishing Options
+description = Adds the ability to add Custom publishing options to the node Add/Edit forms.
+core = 7.x
+package = Other
+
+suggests[] = override_node_options
