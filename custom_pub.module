@@ -241,10 +241,7 @@ function custom_pub_on_action(&$node, &$context) {
  * Allows the user to pick custom publishing options to turn on.
  */
 function custom_pub_on_action_form($context) {
-  $types = variable_get('custom_pub_types', array());//get the current custom publishing types
-  foreach ($types as $type) {
-    $pub_types[$type['type']] = $type['name'];
-  }
+  $pub_types = custom_pub_types_list();
   $form['types'] = array(
     '#title' => t('Custom Publishing Options'),
     '#description' => t('Select the Custom publishing options to toggle on when this action is triggered.'),
@@ -357,4 +354,20 @@ function custom_pub_by_node_type($n_type) {
     }
   }
   return $return_types;
+}
+
+/**
+ * Return all custom publish options defined in the system.
+ * @return array
+ */
+
+function custom_pub_types_list() {
+  $pub_types = array();
+
+  $types = variable_get('custom_pub_types', array());
+  foreach ($types as $type) {
+    $pub_types[$type['type']] = $type['name'];
+  }
+
+  return $pub_types;
 }
