@@ -21,7 +21,7 @@ function custom_pub_admin() {
     }
     $row = array($type['name'], $type['type'], $types_of_nodes, array('data' => '','class' => array('custom_pub-option-edit-cell')));
     $form_row[] = array(
-      'data'=> render(drupal_get_form('custom_pub_edit_'.$type['type'], $type)),
+      'data'=> drupal_get_form('custom_pub_edit_'.$type['type'], $type),
       'colspan'=> 4,
       'class' => array('custom_pub-form-edit'),
     );
@@ -41,7 +41,12 @@ function custom_pub_admin() {
     $table = theme('table', $vars);
     //generate the table for the current options
   }
-  return $table . render(drupal_get_form('custom_pub_add'));
+
+  $output = '';
+  $form = drupal_get_form('custom_pub_add');
+  $output = render($form);
+
+  return $table . $output;
 }
 
 /**
