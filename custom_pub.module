@@ -93,8 +93,6 @@ function custom_pub_forms($form_id, $args) {
  * Implements hook_form_alter().
  */
 function custom_pub_form_alter(&$form, $form_state, $form_id) {
-  //add the options to the node form
-  $access = FALSE;
   if (isset($form['#node_edit_form']) && $form['#node_edit_form'] === TRUE) {
     $node = $form['#node'];
     $types = custom_pub_by_node_type($node);
@@ -105,20 +103,22 @@ function custom_pub_form_alter(&$form, $form_state, $form_id) {
        '#default_value' => $node->{$type['type']},
        '#access' => user_access('administer nodes') ? TRUE : user_access('edit_custom_pub_' . $type['type']),
       );
-      //If $access is already set to true we don't want to override it. Once it's TRUE then it should stay TRUE
-      //If it's not TRUE though then we should set it to the current access value
-      $access = !$access ? user_access('edit_custom_pub_' . $type['type']) : TRUE;
     }
 
-    $form['options']['#access'] = $access;
+    // set access states on core publishing options so we don't create a security issue
+    $core = array('status', 'promote', 'sticky');
 
-    if (!$access) {
-     foreach ($form['options'] as $option) {
-       if (isset($option['#access']) && $option['#access']) {
+    foreach ($core as $core_option) {
+      if (!isset($form['options'][$core_option]['#access'])) {
+        $form['options'][$core_option]['#access'] = user_access('administer nodes') ? TRUE : FALSE;
+      }
+    }
+
+    foreach ($form['options'] as $option) {
+      if (isset($option['#access']) && $option['#access']) {
         $form['options']['#access'] = TRUE;
-       }
-     }
-   }
+      }
+    }
   }
 
   //Add options to the node_type_form for editing default node options
