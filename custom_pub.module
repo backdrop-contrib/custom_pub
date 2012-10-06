@@ -190,7 +190,8 @@ function custom_pub_schema_alter(&$schema) {
  * Implements hook_action_info().
  */
 function custom_pub_action_info() {
-  $actions["custom_pub_on_action"] = array(
+  $actions['custom_pub_on_action'] = array(
+    'label' => 'Toggle a Custom Publishing Option on',
     'type' => 'node',
     'description' => t('Toggle a Custom Publishing Option on'),
     'configurable' => TRUE,
@@ -200,7 +201,8 @@ function custom_pub_action_info() {
       'comment' => array('insert', 'update'),
     ),
   );
-  $actions["custom_pub_off_action"] = array(
+  $actions['custom_pub_off_action'] = array(
+    'label' => 'Toggle a Custom Publishing Option off',
     'type' => 'node',
     'description' => t('Toggle a Custom Publishing Option off'),
     'configurable' => TRUE,
