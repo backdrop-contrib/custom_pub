@@ -373,3 +373,28 @@ function custom_pub_types_list() {
 
   return $pub_types;
 }
+
+/**
+ * Implements hook_node_operations().
+ * @return array
+ */
+
+function custom_pub_node_operations() {
+  $types = custom_pub_types_list();
+  $operations = array();
+
+  foreach ($types as $machine_name => $name) {
+    $operations[$machine_name] = array(
+      'label' => t('Add "!name" status', array('!name' => $name)),
+      'callback' => 'node_mass_update',
+      'callback arguments' => array('updates' => array($machine_name => 1)),
+    );
+    $operations['remove_' . $machine_name] = array(
+      'label' => t('Remove "!type" status', array('!type' => $name)),
+      'callback' => 'node_mass_update',
+      'callback arguments' => array('updates' => array($machine_name => 0)),
+    );
+  }
+
+  return $operations;
+}
