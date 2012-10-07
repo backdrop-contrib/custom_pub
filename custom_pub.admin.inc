@@ -254,7 +254,10 @@ function custom_pub_edit_submit($form, &$form_state) {
 }
 
 /**
- * Menu callback: content administration.
+ * Menu callback: content administration form.
+ * @param $form
+ * @param $form_state
+ * @return array
  */
 function custom_pub_node_admin_content($form, $form_state) {
   custom_pub_node_admin_inc_add();
@@ -264,10 +267,34 @@ function custom_pub_node_admin_content($form, $form_state) {
     array_unshift($del_form['#submit'], 'custom_pub_node_admin_inc_add');
     return $del_form;
   }
+  $custom_publish_types = custom_pub_types_list();
   $form['filter'] = custom_pub_node_filter_form();
   $form['#submit'][] = 'custom_pub_node_filter_form_submit';
   $form['admin'] = node_admin_nodes();
-  #$form['admin']['nodes']['#header']['custom_publish_options'] = array('data' => 'Custom Status');
+
+  /*
+  $changed = $form['admin']['nodes']['#header']['changed'];
+  $operations = $form['admin']['nodes']['#header']['operations'];
+
+  unset($form['admin']['nodes']['#header']['changed']);
+  unset($form['admin']['nodes']['#header']['operations']);
+
+  $form['admin']['nodes']['#header']['custom_publish_options'] = array('data' => 'Custom Status');
+  $form['admin']['nodes']['#header']['changed'] = $changed;
+  $form['admin']['nodes']['#header']['operations'] = $operations;
+
+  foreach ($form['admin']['nodes']['#options'] as $nid => $option) {
+    $form['admin']['nodes']['#options'][$nid]['custom_publish_options'] = array();
+
+    $node = node_load($nid);
+    foreach ($custom_publish_types as $custom_publish_machine_name => $label) {
+      if (isset($node->{$custom_publish_machine_name}) && $node->{$custom_publish_machine_name} == 1) {
+        $form['admin']['nodes']['#options'][$nid]['custom_publish_options'][] = $label;
+      }
+    }
+
+    $form['admin']['nodes']['#options'][$nid]['custom_publish_options'] = count($form['admin']['nodes']['#options'][$nid]['custom_publish_options']) ? implode(', ', $form['admin']['nodes']['#options'][$nid]['custom_publish_options']) : t('none');
+  }*/
 
   //same as above
   array_unshift($form['admin']['options']['submit']['#validate'], 'custom_pub_node_admin_inc_add');
@@ -277,7 +304,6 @@ function custom_pub_node_admin_content($form, $form_state) {
 
 /**
  * Return form for node administration filters.
- *
  * The main difference between this function and the base function is the drupal_alter call after node_filters
  */
 function custom_pub_node_filter_form() {
