@@ -39,7 +39,6 @@ function custom_pub_admin() {
        'rows' => $rows
      );
     $table = theme('table', $vars);
-    //generate the table for the current options
   }
 
   $output = '';
@@ -99,8 +98,7 @@ function custom_pub_add_validate($form, &$form_state) {
   $node = drupal_get_schema('node');
 
   if (isset($types[$type['type']])) {
-    form_set_error('state_machine', t('The machine-readable name %type is already taken.', array(
-    '%type' => $type->type)));
+    form_set_error('state_machine', t('The machine-readable name %type is already taken.', array('%type' => $type->type)));
   }
   if (!preg_match('!^[a-z0-9_]+$!', $type['type'])) {
     form_set_error('state_machine', t('The machine-readable name must contain only lowercase letters, numbers, and underscores.'));
@@ -189,12 +187,13 @@ function custom_pub_edit($form, &$form_state, $type) {
     '#type' => 'submit',
     '#value' => t('Save'),
   );
-  $form['delete'] = array(
-    '#type' => 'submit',
-    '#value' => t('Delete'),
-    '#attributes' => array('id'=>'edit-delete'),
-  );
-
+  if (!isset($type['default'])) {
+    $form['delete'] = array(
+      '#type' => 'submit',
+      '#value' => t('Delete'),
+      '#attributes' => array('id'=>'edit-delete'),
+    );
+  }
   $form['#theme'][] = 'custom_pub_edit_form';
   $form['#validate'][] = 'custom_pub_edit_validate';
   $form['#submit'][] = 'custom_pub_edit_submit';
@@ -268,6 +267,8 @@ function custom_pub_node_admin_content($form, $form_state) {
   $form['filter'] = custom_pub_node_filter_form();
   $form['#submit'][] = 'custom_pub_node_filter_form_submit';
   $form['admin'] = node_admin_nodes();
+  #$form['admin']['nodes']['#header']['custom_publish_options'] = array('data' => 'Custom Status');
+
   //same as above
   array_unshift($form['admin']['options']['submit']['#validate'], 'custom_pub_node_admin_inc_add');
   $form['#validate'][] = 'custom_pub_node_admin_inc_add';
@@ -353,7 +354,7 @@ function custom_pub_node_filter_form() {
 /**
  * Form submit function for node_admin_content
  */
-function custom_pub_node_filter_form_submit ($form, $form_state) {
+function custom_pub_node_filter_form_submit($form, $form_state) {
   $types = variable_get('custom_pub_types', array());
   $filters = node_filters();
   switch ($form_state['values']['op']) {
