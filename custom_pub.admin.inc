@@ -129,7 +129,7 @@ function custom_pub_add_submit($form, &$form_state) {
       $type[trim($form_state['values']['state_machine'])]['node_types'][$node_type] = $node_types->types[$node_type]->name;
     }
   }
-  $ret = array();
+
   $spec = array(
     'description' => 'Custom publishing option '.t(trim($form_state['values']['state'])),
     'type' => 'int',
@@ -144,8 +144,9 @@ function custom_pub_add_submit($form, &$form_state) {
     $success = FALSE;
   }
   if ($success){
-    variable_set('custom_pub_types',array_merge($types,$type));
-    cache_clear_all('schema', 'cache');
+    variable_set('custom_pub_types', array_merge($types,$type));
+    cache_clear_all('entity_info*', 'cache', TRUE);
+    cache_clear_all('schema*', 'cache', TRUE);
     drupal_set_message(t('Publishing option created.'));
   }
   else {
