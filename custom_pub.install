@@ -17,19 +17,17 @@ function custom_pub_install() {
 }
 
 /**
- * Implements hook_uninstall()
+ * Implements hook_uninstall().
  */
 function custom_pub_uninstall() {
   $types = variable_get('custom_pub_types', array());
-  $ret = array();
 
   foreach ($types as $type => $name) {
-    db_drop_field($ret, 'node', $type);
+    db_drop_field('node', $type);
   }
 
   variable_del('custom_pub_types');
   variable_del('custom_pub_node_types');
-  return $ret;
 }
 
 /**
