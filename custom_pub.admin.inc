@@ -249,7 +249,7 @@ function custom_pub_edit_submit($form, &$form_state) {
     drupal_set_message(t('!op publishing option successful.',array('!op' => $form_state['values']['op'])));
   }
   else {
-    drupal_set_message(t('There was an error trying to !op the publishing option. Please Try Again',array('!op'=>$form_state['values']['op'])),'error');
+    drupal_set_message(t('There was an error trying to !op the publishing option. Please Try Again',array('!op' => $form_state['values']['op'])),'error');
   }
 }
 
