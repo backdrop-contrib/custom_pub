@@ -3,19 +3,6 @@
  * @file
  * Install and update function for Custom pub
  */
-/**
- * Implements hook_uninstall()
- */
-function custom_pub_uninstall() {
-	$types = variable_get('custom_pub_types', array());
-	$ret=array();
-	foreach ($types as $type => $name) {
-		db_drop_field($ret,'node',$type);
-	}
-	variable_del('custom_pub_types');
-  variable_del('custom_pub_node_types');
-  return $ret;
-}
 
 /**
  * Implements hook_install().
@@ -27,7 +14,23 @@ function custom_pub_install() {
    ))
    ->condition('name', 'custom_pub')
    ->execute();
-} 
+}
+
+/**
+ * Implements hook_uninstall()
+ */
+function custom_pub_uninstall() {
+  $types = variable_get('custom_pub_types', array());
+  $ret = array();
+
+  foreach ($types as $type => $name) {
+    db_drop_field($ret, 'node', $type);
+  }
+
+  variable_del('custom_pub_types');
+  variable_del('custom_pub_node_types');
+  return $ret;
+}
 
 /**
  * Moves any existing custom publishing options over to Drupal 7
@@ -37,7 +40,7 @@ function custom_pub_update_7100() {
   $node_types = _node_types_build();
   $node_types = array_keys($node_types);
   $spec = array(
-    'description' => 'Custom publishing option '.t(trim($form_state['values']['state'])),
+    'description' => 'Custom publishing option.',
     'type' => 'int',
     'not null' => TRUE,
     'default' => 0
