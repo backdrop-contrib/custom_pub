@@ -51,10 +51,10 @@ function custom_pub_theme() {
  */
 function custom_pub_menu() {
   $items['admin/structure/custom_pub'] = array(
-    'title' => 'Publishing Options',
+    'title' => 'Custom Publishing Options',
     'page callback' => 'custom_pub_admin',
     'access arguments' => array('administer nodes'),
-    'description' => 'Add and remove custom publishing options from the Node form.',
+    'description' => 'Add and remove custom publishing options from the Node form(s).',
     'file' => 'custom_pub.admin.inc',
   );
   return $items;
