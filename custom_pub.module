@@ -325,11 +325,13 @@ function custom_pub_off_action_submit($form, &$form_state) {
 /**
  * Implements hook_query_TAG_alter().
  */
-function custom_pub_query_node_load_multiple_alter($query) {
+function custom_pub_query_node_load_multiple_alter(QueryAlterableInterface $query) {
   $types = variable_get('custom_pub_types', array());
   if (count($types)) {
-    foreach ($types as $field => $types) {
-      $query->addField('base', $field);
+    foreach ($types as $field => $type) {
+      if (db_field_exists('node', $field)) {
+        $query->addField('base', $field);
+      }
     }
   }
 }
@@ -442,8 +444,20 @@ function custom_pub_types($rebuild = FALSE) {
       foreach ($options_array as $type => $option) {
         if (!isset($pub_types[$type])) {
           $pub_types[$type] = $option;
+
+          if (!db_field_exists('node', $type)) {
+            $spec = array(
+              'description' => 'Custom publishing option ' . $option['name'],
+              'type' => 'int',
+              'not null' => TRUE,
+              'default' => 0
+            );
+
+            db_add_field('node', $type, $spec);
+          }
         }
-      $pub_types[$type]['default'] = TRUE;
+
+        $pub_types[$type]['default'] = TRUE;
       }
     }
     variable_set('custom_pub_types', $pub_types);
