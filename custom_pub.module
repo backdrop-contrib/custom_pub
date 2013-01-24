@@ -72,7 +72,7 @@ function custom_pub_menu_alter(&$items) {
  * Implements hook_forms().
  */
 function custom_pub_forms($form_id, $args) {
-  //We need to use this hook because on the admin page there is the possiblity of multiple forms for the edit form. See http://drupal.org/node/354519
+  //We need to use this hook because on the admin page there is the possibility of multiple forms for the edit form. See http://drupal.org/node/354519
   $types = variable_get('custom_pub_types', array());
   foreach ($types as $type) {
     if ($form_id == 'custom_pub_edit_' . $type['type']) {
