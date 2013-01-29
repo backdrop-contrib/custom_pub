@@ -144,9 +144,8 @@ function custom_pub_add_submit($form, &$form_state) {
     $success = FALSE;
   }
   if ($success){
+    cache_clear_all('*', 'cache', TRUE);
     variable_set('custom_pub_types', array_merge($types,$type));
-    cache_clear_all('entity_info*', 'cache', TRUE);
-    cache_clear_all('schema*', 'cache', TRUE);
     drupal_set_message(t('Publishing option created.'));
   }
   else {
@@ -245,8 +244,7 @@ function custom_pub_edit_submit($form, &$form_state) {
     $success = TRUE;
   }
   if ($success) {
-    cache_clear_all('entity_info*', 'cache', TRUE);
-    cache_clear_all('schema*', 'cache', TRUE);
+    cache_clear_all('*', 'cache', TRUE);
     variable_set('custom_pub_types', $types);
     drupal_set_message(t('!op publishing option successful.',array('!op' => $form_state['values']['op'])));
   }
