@@ -234,7 +234,8 @@ function custom_pub_on_action(&$node, &$context) {
   foreach ($context['types'] as $type) {
     if (!empty($type) && in_array($node->type, array_keys($types[$type]['node_types']))) {
       $node->$type = 1;
-      watchdog('action', 'Toggled @type %title custom publishing option: @label to on.', array('@type' => node_get_types('name', $node), '%title' => $node->title, '@label' => $types[$type]['name']));
+      node_save($node);
+      watchdog('action', 'Toggled @type %title custom publishing option: @label to on.', array('@type' => node_type_get_types('name', $node), '%title' => $node->title, '@label' => $types[$type]['name']));
     }
   }
 }
@@ -287,7 +288,8 @@ function custom_pub_off_action(&$node, &$context) {
   foreach ($context['types'] as $type) {
     if (in_array($node->type, array_keys($types[$type]['node_types']))) {
       $node->$type = 0;
-      watchdog('action', 'Toggled @type %title custom publishing option: @label to off.', array('@type' => node_get_types('name', $node), '%title' => $node->title, '@label' => $types[$type]['name']));
+      node_save($node);
+      watchdog('action', 'Toggled @type %title custom publishing option: @label to off.', array('@type' => node_type_get_types('name', $node), '%title' => $node->title, '@label' => $types[$type]['name']));
     }
   }
   return array('node' => $node);
