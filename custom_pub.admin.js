@@ -13,9 +13,9 @@
         $this.text($opt[$txt]);
         return false;
       });
-      $("th.close-cusotm-pub-table").html('<a>X</a>')
+      $("th.close-custom-pub-table").html('<a>X</a>')
       .css('text-align', 'right');
-      $("th.close-cusotm-pub-table > a")
+      $("th.close-custom-pub-table > a")
       .css('cursor', 'pointer')
       .live('click', function() {
         $this = $(this);

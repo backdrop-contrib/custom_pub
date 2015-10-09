@@ -10,7 +10,7 @@ function theme_custom_pub_edit_form($vars) {
     t('Label'),
     t('Machine Name'),
     t('Node Types'),
-    array('data' => '', 'class' => array('close-cusotm-pub-table')),
+    array('data' => '', 'class' => array('close-custom-pub-table')),
   );
   $rows = array(
     array(
