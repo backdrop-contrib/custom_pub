@@ -98,10 +98,10 @@ function custom_pub_form_alter(&$form, $form_state, $form_id) {
     $types = custom_pub_by_node_type($node);
     foreach ($types as $type) {
       $form['options'][$type['type']] = array(
-       '#type' => 'checkbox',
-       '#title' => check_plain($type['name']),
-       '#default_value' => $node->{$type['type']},
-       '#access' => user_access('administer nodes') ? TRUE : user_access('edit_custom_pub_' . $type['type']),
+        '#type' => 'checkbox',
+        '#title' => check_plain($type['name']),
+        '#default_value' => $node->{$type['type']},
+        '#access' => user_access('administer nodes') ? TRUE : user_access('edit_custom_pub_' . $type['type']),
       );
     }
 
@@ -154,20 +154,20 @@ function custom_pub_views_data_alter(&$data) {
 
     // published status
     $data['node'][$type['type']] = array(
-			'title' => t($type['name']),
-			'help' => t('Custom Publishing Option. Appears in: !types', array('!types' => implode(', ', $used_in))),
-			'field' => array(
-				'handler' => 'views_handler_field_boolean',
-				'click sortable' => TRUE,
-			),
-			'filter' => array(
-				'handler' => 'views_handler_filter_boolean_operator',
-				'label' => t($type['name']),
-				'type' => 'yes-no',
-			),
-			'sort' => array(
-				'handler' => 'views_handler_sort',
-			),
+      'title' => t($type['name']),
+      'help' => t('Custom Publishing Option. Appears in: !types', array('!types' => implode(', ', $used_in))),
+      'field' => array(
+        'handler' => 'views_handler_field_boolean',
+        'click sortable' => TRUE,
+      ),
+      'filter' => array(
+        'handler' => 'views_handler_filter_boolean_operator',
+        'label' => t($type['name']),
+        'type' => 'yes-no',
+      ),
+      'sort' => array(
+        'handler' => 'views_handler_sort',
+      ),
     );
   }
 }
@@ -365,7 +365,7 @@ function custom_pub_node_prepare($node) {
 function custom_pub_by_node_type($node_type) {
   $return_types = array();
   if (is_object($node_type) || is_array($node_type)) {
-    (object)$node_type;
+    (object) $node_type;
     $node_type = $node_type->type;
   }
   $types = variable_get('custom_pub_types', array());

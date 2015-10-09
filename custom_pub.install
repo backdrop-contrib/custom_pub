@@ -7,13 +7,13 @@
 /**
  * Implements hook_install().
  */
-function custom_pub_install() { 
+function custom_pub_install() {
   db_update('system')
-   ->fields(array(
-     'weight' => 10,
-   ))
-   ->condition('name', 'custom_pub')
-   ->execute();
+    ->fields(array(
+      'weight' => 10,
+    ))
+    ->condition('name', 'custom_pub')
+    ->execute();
 }
 
 /**
@@ -61,9 +61,9 @@ function custom_pub_update_7100() {
  */
 function custom_pub_update_7101() {
   db_update('system')
-   ->fields(array(
-     'weight' => 10,
-   ))
-   ->condition('name', 'custom_pub')
-   ->execute();
-} 
+    ->fields(array(
+      'weight' => 10,
+    ))
+    ->condition('name', 'custom_pub')
+    ->execute();
+}

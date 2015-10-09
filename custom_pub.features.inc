@@ -113,7 +113,7 @@ function custom_pub_features_enable_feature($module) {
       'type' => 'int',
       'not null' => TRUE,
       'default' => 0
-     );
+    );
     // Add fields in database
     foreach ($default_options as $option_name => $option_info) {
       if (!db_field_exists('node', $option_name)) {

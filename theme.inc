@@ -1,11 +1,11 @@
 <?php
 /**
  * @file
- *   Theme functions for Custom publishing options
+ * Theme functions for Custom publishing options
  */
 function theme_custom_pub_edit_form($vars) {
   $form = $vars['form'];
-  $type = $form['type']['#value'];  
+  $type = $form['type']['#value'];
   $head = array(
     t('Label'),
     t('Machine Name'),

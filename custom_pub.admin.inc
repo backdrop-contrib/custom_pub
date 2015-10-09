@@ -1,7 +1,7 @@
 <?php
 /**
  * @file
- *   Admin functions
+ * Admin functions
  */
 
 /**
@@ -10,7 +10,7 @@
 function custom_pub_admin() {
   $table = '';
   //add the js for the admin page
-  drupal_add_js(drupal_get_path('module','custom_pub').'/custom_pub.admin.js');
+  drupal_add_js(drupal_get_path('module', 'custom_pub') . '/custom_pub.admin.js');
   $types = variable_get('custom_pub_types', array());//get the current custom publishing types
   foreach ($types as $type) {
     // Build table rows for the
@@ -19,10 +19,10 @@ function custom_pub_admin() {
     if (isset($type['node_types']) && is_array($type['node_types'])) {
       $types_of_nodes = implode(', ', $type['node_types']);
     }
-    $row = array($type['name'], $type['type'], $types_of_nodes, array('data' => '','class' => array('custom_pub-option-edit-cell')));
+    $row = array($type['name'], $type['type'], $types_of_nodes, array('data' => '', 'class' => array('custom_pub-option-edit-cell')));
     $form_row[] = array(
-      'data'=> drupal_get_form('custom_pub_edit_'.$type['type'], $type),
-      'colspan'=> 4,
+      'data' => drupal_get_form('custom_pub_edit_' . $type['type'], $type),
+      'colspan' => 4,
       'class' => array('custom_pub-form-edit'),
     );
     $rows[] = array('data' => $row, 'class' => array('custom_pub-option-row'));
@@ -30,14 +30,14 @@ function custom_pub_admin() {
   }
   if (!empty($rows)) {
     $vars = array(
-       'header' => array(
-         t('Label'),
-         t('Machine Name'),
-         t('Node Types'),
-         array('data'=>'','class' => array('custom_pub-head-edit')),
-       ),
-       'rows' => $rows
-     );
+      'header' => array(
+        t('Label'),
+        t('Machine Name'),
+        t('Node Types'),
+        array('data' => '', 'class' => array('custom_pub-head-edit')),
+      ),
+      'rows' => $rows
+    );
     $table = theme('table', $vars);
   }
 
@@ -53,7 +53,7 @@ function custom_pub_admin() {
  */
 function custom_pub_add($form, &$form_state) {
   $node_types = _node_types_build();
-  foreach($node_types->types as $node_type => $info) {
+  foreach ($node_types->types as $node_type => $info) {
     $types[$node_type] = $info->name;
   }
   $form['state_fs'] = array(
@@ -65,13 +65,13 @@ function custom_pub_add($form, &$form_state) {
     '#type' => 'textfield',
     '#description' => t('The label for your custom publishing option. This is the text that will be displayed on the node add/edit form.'),
     '#maxlength' => 255,
-      '#required' => TRUE,
+    '#required' => TRUE,
   );
   $form['state_fs']['state_machine'] = array(
     '#type' => 'textfield',
     '#title' => t('Option name'),
     '#description' => t('The machine-readable name of this publishing option. This text will be used for constructing the database table column name. This name must contain only lowercase letters, numbers, and underscores. This name must be unique.'),
-      '#required' => TRUE,
+    '#required' => TRUE,
   );
   $form['state_fs']['node_types'] = array(
     '#type' => 'checkboxes',
@@ -131,7 +131,7 @@ function custom_pub_add_submit($form, &$form_state) {
   }
 
   $spec = array(
-    'description' => 'Custom publishing option '.t(trim($form_state['values']['state'])),
+    'description' => 'Custom publishing option ' . t(trim($form_state['values']['state'])),
     'type' => 'int',
     'not null' => TRUE,
     'default' => 0
@@ -140,16 +140,16 @@ function custom_pub_add_submit($form, &$form_state) {
     db_add_field('node', trim($form_state['values']['state_machine']), $spec);
     $success = TRUE;
   }
-  catch (Exception $e){
+  catch (Exception $e) {
     $success = FALSE;
   }
-  if ($success){
+  if ($success) {
     cache_clear_all('*', 'cache', TRUE);
-    variable_set('custom_pub_types', array_merge($types,$type));
+    variable_set('custom_pub_types', array_merge($types, $type));
     drupal_set_message(t('Publishing option created.'));
   }
   else {
-    drupal_set_message(t('There was an error creating your Publishing option.'),'error');
+    drupal_set_message(t('There was an error creating your Publishing option.'), 'error');
   }
 }
 
@@ -191,7 +191,7 @@ function custom_pub_edit($form, &$form_state, $type) {
     $form['delete'] = array(
       '#type' => 'submit',
       '#value' => t('Delete'),
-      '#attributes' => array('id'=>'edit-delete'),
+      '#attributes' => array('id' => 'edit-delete'),
     );
   }
   $form['#theme'][] = 'custom_pub_edit_form';
@@ -228,11 +228,11 @@ function custom_pub_edit_submit($form, &$form_state) {
       db_drop_field('node', $type['type']);
       $success = TRUE;
     }
-    catch (Exception $e){
+    catch (Exception $e) {
       $success = FALSE;
     }
   }
-  else{
+  else {
     unset($types[$type['type']]['node_types']);
     foreach ($form_state['values']['node_types'] as $node_type => $value) {
       if (!empty($value)) {
@@ -246,10 +246,10 @@ function custom_pub_edit_submit($form, &$form_state) {
   if ($success) {
     cache_clear_all('*', 'cache', TRUE);
     variable_set('custom_pub_types', $types);
-    drupal_set_message(t('!op publishing option successful.',array('!op' => $form_state['values']['op'])));
+    drupal_set_message(t('!op publishing option successful.', array('!op' => $form_state['values']['op'])));
   }
   else {
-    drupal_set_message(t('There was an error trying to !op the publishing option. Please Try Again',array('!op' => $form_state['values']['op'])),'error');
+    drupal_set_message(t('There was an error trying to !op the publishing option. Please Try Again', array('!op' => $form_state['values']['op'])), 'error');
   }
 }
 
@@ -394,7 +394,7 @@ function custom_pub_node_filter_form_submit($form, $form_state) {
           $flat_options = form_options_flatten($filters[$filter]['options']);
           // Only accept valid selections offered on the dropdown, block bad input.
           if ($filter == 'status') {
-            list($type, $val) = explode('-',$form_state['values'][$filter]);
+            list($type, $val) = explode('-', $form_state['values'][$filter]);
             $custom = isset($types[$type]);
           }
           if (isset($flat_options[$form_state['values'][$filter]]) || $custom) {
@@ -417,7 +417,7 @@ function custom_pub_node_filter_form_submit($form, $form_state) {
  */
 function custom_pub_node_filters_alter(&$filters) {
   $types = variable_get('custom_pub_types', array());
-  foreach($types as $type) {
+  foreach ($types as $type) {
     $filters['status']['options'][$type['type'] . '-1'] = t($type['name']);
     $filters['status']['options'][$type['type'] . '-0'] = t('not ' . $type['name']);
   }
@@ -428,5 +428,5 @@ function custom_pub_node_filters_alter(&$filters) {
  * This is generally called from form validate function or build function to ensure the files are always there.
  */
 function custom_pub_node_admin_inc_add() {
-  module_load_include('inc','node', 'node.admin');
+  module_load_include('inc', 'node', 'node.admin');
 }

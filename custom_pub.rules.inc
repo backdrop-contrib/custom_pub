@@ -1,5 +1,4 @@
 <?php
-
 /**
  * @file
  * Rules integration with custom publishing options module.
@@ -35,5 +34,5 @@ function custom_pub_rules_condition_info() {
 }
 
 function custom_pub_rules_condition_node_has_option($node, $option) {
-  return (bool)$node->$option;
+  return (bool) $node->$option;
 }
