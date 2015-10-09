@@ -63,14 +63,14 @@ function custom_pub_add($form, &$form_state) {
   $form['state_fs']['state'] = array(
     '#title' => t('Publishing label'),
     '#type' => 'textfield',
-    '#description' => t('The label for your custom publishing option.This is the text that will be displayed on the node add/edit form'),
+    '#description' => t('The label for your custom publishing option. This is the text that will be displayed on the node add/edit form.’),
     '#maxlength' => 255,
       '#required' => TRUE,
   );
   $form['state_fs']['state_machine'] = array(
     '#type' => 'textfield',
     '#title' => t('Option name'),
-    '#description' => t('The machine-readable name of this publishing option. This text will be used for constructing the database table column name. This name must contain only lowercase letters,numbers, and underscores. This name must be unique.'),
+    '#description' => t('The machine-readable name of this publishing option. This text will be used for constructing the database table column name. This name must contain only lowercase letters, numbers, and underscores. This name must be unique.'),
       '#required' => TRUE,
   );
   $form['state_fs']['node_types'] = array(
