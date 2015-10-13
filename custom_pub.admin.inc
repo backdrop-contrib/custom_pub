@@ -52,10 +52,6 @@ function custom_pub_admin() {
  * Form callback function for add form
  */
 function custom_pub_add($form, &$form_state) {
-  $node_types = _node_types_build();
-  foreach ($node_types->types as $node_type => $info) {
-    $types[$node_type] = $info->name;
-  }
   $form['state_fs'] = array(
     '#type' => 'fieldset',
     '#title' => t('Add A Publishing Option'),
@@ -77,7 +73,7 @@ function custom_pub_add($form, &$form_state) {
     '#type' => 'checkboxes',
     '#title' => t('Available on'),
     '#description' => t('The Node Types this option is available on.'),
-    '#options' => $types,
+    '#options' => node_type_get_names(),
   );
   $form['state_fs']['submit'] = array(
     '#type' => 'submit',
@@ -157,10 +153,6 @@ function custom_pub_add_submit($form, &$form_state) {
  * Form callback function for edit form
  */
 function custom_pub_edit($form, &$form_state, $type) {
-  $node_types = _node_types_build();
-  foreach ($node_types->types as $node_type => $info) {
-    $types[$node_type] = $info->name;
-  }
   $form['type'] = array(
     '#type' => 'value',
     '#value' => $type,
@@ -176,7 +168,7 @@ function custom_pub_edit($form, &$form_state, $type) {
     '#type' => 'checkboxes',
     '#title' => t('Available on'),
     '#description' => t('The Node Types this option is available on.'),
-    '#options' => $types,
+    '#options' => node_type_get_names(),
     '#default_value' => isset($type['node_types']) ? array_keys($type['node_types']) : array(),
   );
   $form['stateh'] = array(
