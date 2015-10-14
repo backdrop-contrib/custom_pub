@@ -6,7 +6,7 @@
       $("tr.custom_pub-form-edit").hide();
       $("td.custom_pub-option-edit-cell > a").bind('click', function () {
         $this = $(this);
-        $opt = new Array();
+        $opt = [];
         $opt["Edit"] = "Close";
         $opt["Close"] = "Edit";
         $this.parents('tr.custom_pub-option-row').next("tr.custom_pub-form-edit").toggle();
@@ -20,7 +20,7 @@
       .css('cursor', 'pointer')
       .live('click', function () {
         $this = $(this);
-        $opt = new Array();
+        $opt = [];
         $opt["Edit"] = "Close";
         $opt["Close"] = "Edit";
         $row = $this.parents("tr.custom_pub-form-edit");
