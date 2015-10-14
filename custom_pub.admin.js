@@ -1,4 +1,5 @@
 (function($) {
+  "use strict";
   Drupal.behaviors.custom_pub_admin = {
     attach : function() {
       $("td.custom_pub-option-edit-cell").html('<a href="#">Edit</a>').css("text-align", "right");
