@@ -1,10 +1,10 @@
-(function($) {
+(function ($) {
   "use strict";
   Drupal.behaviors.custom_pub_admin = {
-    attach : function() {
+    attach: function () {
       $("td.custom_pub-option-edit-cell").html('<a href="#">Edit</a>').css("text-align", "right");
       $("tr.custom_pub-form-edit").hide();
-      $("td.custom_pub-option-edit-cell > a").bind('click', function() {
+      $("td.custom_pub-option-edit-cell > a").bind('click', function () {
         $this = $(this);
         $opt = new Array();
         $opt["Edit"] = "Close";
@@ -18,7 +18,7 @@
       .css('text-align', 'right');
       $("th.close-custom-pub-table > a")
       .css('cursor', 'pointer')
-      .live('click', function() {
+      .live('click', function () {
         $this = $(this);
         $opt = new Array();
         $opt["Edit"] = "Close";
