@@ -2,14 +2,18 @@
   "use strict";
   Drupal.behaviors.custom_pub_admin = {
     attach: function () {
-      $("td.custom_pub-option-edit-cell").html('<a href="#">Edit</a>').css("text-align", "right");
+      var toggleButtonLabels = {
+        edit: Drupal.t('Edit'),
+        close: Drupal.t('Close')
+      };
+      $("td.custom_pub-option-edit-cell").html('<a href="#">' + toggleButtonLabels.edit + '</a>').css("text-align", "right");
       $("tr.custom_pub-form-edit").hide();
       $("td.custom_pub-option-edit-cell > a").bind('click', function () {
         var $this = $(this);
         var opt = [];
         var txt = $this.text();
-        opt["Edit"] = "Close";
-        opt["Close"] = "Edit";
+        opt[toggleButtonLabels.edit] = toggleButtonLabels.close;
+        opt[toggleButtonLabels.close] = toggleButtonLabels.edit;
         $this.parents('tr.custom_pub-option-row').next("tr.custom_pub-form-edit").toggle();
         $this.text(opt[txt]);
         return false;
