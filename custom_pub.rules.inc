@@ -1,14 +1,14 @@
 <?php
 /**
  * @file
- * Rules integration with custom publishing options module.
+ * Rules integration for Custom Publishing Options module.
  *
  * @addtogroup rules
  * @{
  */
 
 /**
- * Implements hook_rules_condition_info()
+ * Implements hook_rules_condition_info().
  */
 function custom_pub_rules_condition_info() {
   $items = array();

@@ -1,4 +1,8 @@
 <?php
+/**
+ * @file
+ * Adds the ability to add Custom publishing options to the node Add/Edit forms.
+ */
 
 /**
  * Implements hook_help().
@@ -218,14 +222,15 @@ function custom_pub_action_info() {
 }
 
 /**
- * Implements a configurable action
- * Toggles a custom publishing option on as an action
+ * Implements a configurable action.
+ *
+ * Toggles a custom publishing option on as an action.
  *
  * @param $node
- *   The node object of the current node
+ *   The node object of the current node.
  *
  * @param $context
- *   The available context of the current action
+ *   The available context of the current action.
  */
 function custom_pub_on_action(&$node, &$context) {
   //This is mainly for the Rules Module. I couldn't get a node to save unless I set this manually
@@ -241,8 +246,10 @@ function custom_pub_on_action(&$node, &$context) {
 }
 
 /**
- * Implements a configurable action form
+ * Implements a configurable action form.
+ *
  * Allows the user to pick custom publishing options to turn on.
+ *
  * @param $context
  * @return array
  */
@@ -261,6 +268,7 @@ function custom_pub_on_action_form($context) {
 
 /**
  * Submit callback for custom_pub_on_action_form().
+ *
  * @param $form
  * @param $form_state
  * @return array
@@ -270,14 +278,15 @@ function custom_pub_on_action_submit($form, &$form_state) {
 }
 
 /**
- * Implements a configurable action
- * Toggles a custom publishing option off as an action
+ * Implements a configurable action.
+ *
+ * Toggles a custom publishing option off as an action.
  *
  * @param $node
- *   The node object of the current node
+ *   The node object of the current node.
  *
  * @param $context
- *   The available context of the current action
+ *   The available context of the current action.
  *
  * @return array
  */
@@ -296,8 +305,10 @@ function custom_pub_off_action(&$node, &$context) {
 }
 
 /**
- * Implements a configurable action form
+ * Implements a configurable action form.
+ *
  * Allows the user to pick custom publishing options to turn off.
+ *
  * @param $context
  * @return array
  */
@@ -316,6 +327,7 @@ function custom_pub_off_action_form($context) {
 
 /**
  * Submit callback for custom_pub_off_action_form().
+ *
  * @param $form
  * @param $form_state
  * @return array
@@ -355,10 +367,10 @@ function custom_pub_node_prepare($node) {
 }
 
 /**
- * Returns only the custom types available for the given node type
+ * Returns only the custom types available for the given node type.
  *
  * @param $node_type
- *   Can be either a string of the node type or an object/array with a key of 'type'
+ *   Can be either a string of the node type or an object/array with a key of 'type'.
  *
  * @return array
  */
@@ -379,7 +391,10 @@ function custom_pub_by_node_type($node_type) {
 
 /**
  * Return all custom publish options defined in the system.
- * This is different than custom_pub_types(), as we return an array of machine name keyed to the name of the option.
+ *
+ * This is different than custom_pub_types(), as we return an array of machine
+ * name keyed to the name of the option.
+ *
  * @return array
  */
 function custom_pub_types_list() {
@@ -395,6 +410,7 @@ function custom_pub_types_list() {
 
 /**
  * Implements hook_node_operations().
+ *
  * @return array
  */
 function custom_pub_node_operations() {
@@ -419,6 +435,7 @@ function custom_pub_node_operations() {
 
 /**
  * Implements hook_features_api().
+ *
  * @return array
  */
 function custom_pub_features_api() {
@@ -434,6 +451,7 @@ function custom_pub_features_api() {
 
 /**
  * Returns custom publish types defined in the system.
+ *
  * @param bool $rebuild
  * @return array
  */
@@ -469,7 +487,9 @@ function custom_pub_types($rebuild = FALSE) {
 }
 
 /**
- * Rebuilds list of custom publish options, typically used during Features enabling/reverting/disabling.
+ * Rebuilds list of custom publish options.
+ *
+ * Typically used during Features enabling/reverting/disabling.
  */
 function custom_pub_types_rebuild() {
   custom_pub_types(TRUE);

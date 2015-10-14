@@ -1,7 +1,7 @@
 <?php
 /**
  * @file
- * Install and update function for Custom pub
+ * Install and update function for Custom Publishing Options.
  */
 
 /**
@@ -31,7 +31,7 @@ function custom_pub_uninstall() {
 }
 
 /**
- * Moves any existing custom publishing options over to Drupal 7
+ * Moves any existing custom publishing options over to Drupal 7.
  */
 function custom_pub_update_7100() {
   $types = variable_get('custom_pub_types', array());
@@ -57,7 +57,7 @@ function custom_pub_update_7100() {
 }
 
 /**
- * Updates the Custom Publishing Options modules weight in the system table
+ * Updates the Custom Publishing Options modules weight in the system table.
  */
 function custom_pub_update_7101() {
   db_update('system')

@@ -1,11 +1,11 @@
 <?php
 /**
  * @file
- * Admin functions
+ * Admin functions.
  */
 
 /**
- * Callback function for Custom Publishing Options menu item
+ * Callback function for Custom Publishing Options menu item.
  */
 function custom_pub_admin() {
   $table = '';
@@ -49,7 +49,7 @@ function custom_pub_admin() {
 }
 
 /**
- * Form callback function for add form
+ * Form callback function for add form.
  */
 function custom_pub_add($form, &$form_state) {
   $form['state_fs'] = array(
@@ -84,7 +84,7 @@ function custom_pub_add($form, &$form_state) {
 }
 
 /**
- * Form validation function for add form
+ * Form validation function for add form.
  */
 function custom_pub_add_validate($form, &$form_state) {
   $types = variable_get('custom_pub_types', array());
@@ -112,7 +112,7 @@ function custom_pub_add_validate($form, &$form_state) {
 }
 
 /**
- * Form submit function for add form
+ * Form submit function for add form.
  */
 function custom_pub_add_submit($form, &$form_state) {
   $types = variable_get('custom_pub_types', array());
@@ -150,7 +150,7 @@ function custom_pub_add_submit($form, &$form_state) {
 }
 
 /**
- * Form callback function for edit form
+ * Form callback function for the edit form.
  */
 function custom_pub_edit($form, &$form_state, $type) {
   $form['type'] = array(
@@ -193,7 +193,7 @@ function custom_pub_edit($form, &$form_state, $type) {
 }
 
 /**
- * Form validate function for edit form
+ * Form validate function for the edit form.
  */
 function custom_pub_edit_validate($form, &$form_state) {
   $types = variable_get('custom_pub_types', array());
@@ -207,7 +207,7 @@ function custom_pub_edit_validate($form, &$form_state) {
 }
 
 /**
- * Form submit function for edit form
+ * Form submit function for the edit form.
  */
 function custom_pub_edit_submit($form, &$form_state) {
   $node_types = _node_types_build();
@@ -247,6 +247,7 @@ function custom_pub_edit_submit($form, &$form_state) {
 
 /**
  * Menu callback: content administration form.
+ *
  * @param $form
  * @param $form_state
  * @return array
@@ -295,8 +296,10 @@ function custom_pub_node_admin_content($form, $form_state) {
 }
 
 /**
- * Return form for node administration filters.
- * The main difference between this function and the base function is the drupal_alter call after node_filters
+ * Return the form for node administration filters.
+ *
+ * The main difference between this function and the base function is the
+ * drupal_alter() call after node_filters().
  */
 function custom_pub_node_filter_form() {
   $session = isset($_SESSION['node_overview_filter']) ? $_SESSION['node_overview_filter'] : array();
@@ -370,7 +373,7 @@ function custom_pub_node_filter_form() {
 }
 
 /**
- * Form submit function for node_admin_content
+ * Form submit function for the content administration form.
  */
 function custom_pub_node_filter_form_submit($form, $form_state) {
   $types = variable_get('custom_pub_types', array());
@@ -405,7 +408,7 @@ function custom_pub_node_filter_form_submit($form, $form_state) {
 }
 
 /**
- * Implements hook_node_filters_alter()
+ * Implements hook_node_filters_alter().
  */
 function custom_pub_node_filters_alter(&$filters) {
   $types = variable_get('custom_pub_types', array());
@@ -417,7 +420,9 @@ function custom_pub_node_filters_alter(&$filters) {
 
 /**
  * Adds the node.admin.inc file when called.
- * This is generally called from form validate function or build function to ensure the files are always there.
+ *
+ * This is generally called from form validate function or build function to
+ * ensure the files are always there.
  */
 function custom_pub_node_admin_inc_add() {
   module_load_include('inc', 'node', 'node.admin');

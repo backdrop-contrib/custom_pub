@@ -1,7 +1,11 @@
 <?php
 /**
  * @file
- * Theme functions for Custom publishing options
+ * Theme functions for Custom Publishing Options.
+ */
+
+/**
+ * Return markup for the edit form.
  */
 function theme_custom_pub_edit_form($vars) {
   $form = $vars['form'];
