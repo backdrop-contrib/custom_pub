@@ -24,12 +24,12 @@
         $opt["Edit"] = "Close";
         $opt["Close"] = "Edit";
         $row = $this.parents("tr.custom_pub-form-edit");
-        $row.toggle()
+        $row.toggle();
         $link = $row.prev('tr.custom_pub-option-row').find("td.custom_pub-option-edit-cell > a");
         $txt = $link.text();
         $link.text($opt[$txt]);
         return false;
       });
     }
-  }
+  };
 })(jQuery);
