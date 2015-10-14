@@ -20,14 +20,9 @@
       .css('cursor', 'pointer')
       .live('click', function () {
         var $this = $(this);
-        var opt = [];
         var $row = $this.parents("tr.custom_pub-form-edit");
         var $link = $row.prev('tr.custom_pub-option-row').find("td.custom_pub-option-edit-cell > a");
-        var txt = $link.text();
-        opt["Edit"] = "Close";
-        opt["Close"] = "Edit";
-        $row.toggle();
-        $link.text(opt[txt]);
+        $link.click();
         return false;
       });
     }
