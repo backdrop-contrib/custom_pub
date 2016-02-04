@@ -25,8 +25,8 @@ function custom_pub_help($path, $arg) {
  */
 function custom_pub_permission() {
   $permissions = array();
-
   $types = variable_get('custom_pub_types', array());
+
   foreach ($types as $type) {
     $key = 'edit_custom_pub_' . $type['type'];
     $permissions[$key] = array(
@@ -122,11 +122,14 @@ function custom_pub_form_alter(&$form, $form_state, $form_id) {
   if (isset($form['#node_edit_form']) && $form['#node_edit_form'] === TRUE) {
     $node = $form['#node'];
     $types = custom_pub_by_node_type($node);
+
     foreach ($types as $type) {
+      $default_value = (isset($node->{$type['type']})) ? $node->{$type['type']} : NULL;
+
       $form['options'][$type['type']] = array(
         '#type' => 'checkbox',
         '#title' => check_plain($type['name']),
-        '#default_value' => $node->{$type['type']},
+        '#default_value' => $default_value,
         '#access' => user_access('administer nodes') ? TRUE : user_access('edit_custom_pub_' . $type['type']),
       );
     }
