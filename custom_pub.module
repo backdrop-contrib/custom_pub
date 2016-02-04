@@ -128,7 +128,7 @@ function custom_pub_form_alter(&$form, $form_state, $form_id) {
 
       $form['options'][$type['type']] = array(
         '#type' => 'checkbox',
-        '#title' => check_plain($type['name']),
+        '#title' => check_plain(t($type['name'])),
         '#default_value' => $default_value,
         '#access' => user_access('administer nodes') ? TRUE : user_access('edit_custom_pub_' . $type['type']),
       );
@@ -155,8 +155,9 @@ function custom_pub_form_alter(&$form, $form_state, $form_id) {
   if ($form_id == 'node_type_form') {
     $node_type = $form['#node_type'];
     $types = custom_pub_by_node_type($node_type);
+
     foreach ($types as $type) {
-      $form['workflow']['node_options']['#options'][$type['type']] = t($type['name']);
+      $form['workflow']['node_options']['#options'][$type['type']] = check_plain(t($type['name']));
     }
   }
 
