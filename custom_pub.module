@@ -392,6 +392,36 @@ function custom_pub_node_prepare($node) {
 }
 
 /**
+ * Implements hook_entity_property_info().
+ */
+function custom_pub_entity_property_info() {
+  $info = array();
+
+  $types = variable_get('custom_pub_types', array());
+  if (!empty($types)) {
+    $properties = &$info['node']['properties'];
+
+    foreach ($types as $type) {
+      if (isset($type['node_types']) && is_array($type['node_types'])) {
+        $description = t('Custom Publishing Option. Appears in: !types', array('!types' => implode(', ', $type['node_types'])));
+      }
+      else {
+        $description = t('Custom Publishing Option. Not currently used.');
+      }
+
+      $properties[$type['type']] = array(
+        'label' => t($type['name']),
+        'type' => 'boolean',
+        'setter callback' => 'entity_property_verbatim_set',
+        'description' => $description,
+      );
+    }
+  }
+
+  return $info;
+}
+
+/**
  * Returns only the custom types available for the given node type.
  *
  * @param $node_type
