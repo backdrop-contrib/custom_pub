@@ -9,9 +9,12 @@
  */
 function custom_pub_admin() {
   $table = '';
+
   //add the js for the admin page
   drupal_add_js(drupal_get_path('module', 'custom_pub') . '/custom_pub.admin.js');
+
   $types = variable_get('custom_pub_types', array());//get the current custom publishing types
+
   foreach ($types as $type) {
     // Build table rows for the
     $form_row = array();
@@ -28,6 +31,7 @@ function custom_pub_admin() {
     $rows[] = array('data' => $row, 'class' => array('custom_pub-option-row'));
     $rows[] = array('data' => $form_row, 'class' => array('custom_pub-form-edit'));
   }
+
   if (!empty($rows)) {
     $vars = array(
       'header' => array(
@@ -44,18 +48,21 @@ function custom_pub_admin() {
   $output = '';
   $form = drupal_get_form('custom_pub_add');
   $output = render($form);
-
   return $table . $output;
 }
 
 /**
- * Form callback function for add form.
+ * Form callback to add a publishing option.
+ * @param $form
+ * @param $form_state
+ * @return mixed
  */
 function custom_pub_add($form, &$form_state) {
   $form['state_fs'] = array(
     '#type' => 'fieldset',
-    '#title' => t('Add A Publishing Option'),
+    '#title' => t('Add a Publishing Option'),
   );
+
   $form['state_fs']['state'] = array(
     '#title' => t('Publishing label'),
     '#type' => 'textfield',
@@ -63,18 +70,21 @@ function custom_pub_add($form, &$form_state) {
     '#maxlength' => 255,
     '#required' => TRUE,
   );
+
   $form['state_fs']['state_machine'] = array(
     '#type' => 'textfield',
     '#title' => t('Option name'),
     '#description' => t('The machine-readable name of this publishing option. This text will be used for constructing the database table column name. This name must contain only lowercase letters, numbers, and underscores. This name must be unique.'),
     '#required' => TRUE,
   );
+
   $form['state_fs']['node_types'] = array(
     '#type' => 'checkboxes',
     '#title' => t('Available on'),
     '#description' => t('The Node Types this option is available on.'),
     '#options' => node_type_get_names(),
   );
+
   $form['state_fs']['submit'] = array(
     '#type' => 'submit',
     '#value' => t('Add'),
@@ -84,7 +94,9 @@ function custom_pub_add($form, &$form_state) {
 }
 
 /**
- * Form validation function for add form.
+ * Validate handler
+ * @param $form
+ * @param $form_state
  */
 function custom_pub_add_validate($form, &$form_state) {
   $types = variable_get('custom_pub_types', array());
@@ -112,7 +124,9 @@ function custom_pub_add_validate($form, &$form_state) {
 }
 
 /**
- * Form submit function for add form.
+ * Submit handler
+ * @param $form
+ * @param $form_state
  */
 function custom_pub_add_submit($form, &$form_state) {
   $types = variable_get('custom_pub_types', array());
@@ -140,7 +154,7 @@ function custom_pub_add_submit($form, &$form_state) {
     $success = FALSE;
   }
   if ($success) {
-    drupal_flush_all_caches();
+    cache_clear_all('*', 'cache', TRUE);
     variable_set('custom_pub_types', array_merge($types, $type));
     drupal_set_message(t('Publishing option created.'));
   }
@@ -189,11 +203,14 @@ function custom_pub_edit($form, &$form_state, $type) {
   $form['#theme'][] = 'custom_pub_edit_form';
   $form['#validate'][] = 'custom_pub_edit_validate';
   $form['#submit'][] = 'custom_pub_edit_submit';
+
   return $form;
 }
 
 /**
- * Form validate function for the edit form.
+ * Validate handler
+ * @param $form
+ * @param $form_state
  */
 function custom_pub_edit_validate($form, &$form_state) {
   $types = variable_get('custom_pub_types', array());
@@ -236,7 +253,7 @@ function custom_pub_edit_submit($form, &$form_state) {
     $success = TRUE;
   }
   if ($success) {
-    drupal_flush_all_caches();
+    cache_clear_all('*', 'cache', TRUE);
     variable_set('custom_pub_types', $types);
     drupal_set_message(t('!op publishing option successful.', array('!op' => $form_state['values']['op'])));
   }
