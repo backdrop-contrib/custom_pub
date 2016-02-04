@@ -570,3 +570,23 @@ function custom_pub_i18n_sync_options_alter(&$fields, $type) {
     );
   }
 }
+
+/**
+ * Implements hook_preprocess_node().
+ * Add the custom publishing option state as a class if it is enabled, similar to core node publish states.
+ * @param $variables
+ */
+function custom_pub_preprocess_node(&$variables) {
+  $types = custom_pub_by_node_type($variables['type']);
+
+  if (count($types)) {
+    $ids = array_keys($types);
+    $node = $variables['node'];
+
+    foreach ($ids as $machine_name) {
+      if (isset($node->{$machine_name}) && $node->{$machine_name}) {
+        $variables['classes_array'][] = 'node-' . $machine_name;
+      }
+    }
+  }
+}
