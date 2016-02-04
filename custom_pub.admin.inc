@@ -8,6 +8,10 @@
  * Callback function for Custom Publishing Options menu item.
  */
 function custom_pub_admin() {
+  $output = '<h3>Custom Publishing Options</h3>';
+
+  $output .= '<p>Creating/editing/deleting options requires clearing the Drupal cache before you can use them. It is advised to make as many edits here that you need, and then clear the cache to propogate the updates.</p>';
+
   $table = '';
 
   //add the js for the admin page
@@ -51,7 +55,7 @@ function custom_pub_admin() {
     $table = theme('table', $vars);
   }
 
-  return $table;
+  return $output . $table;
 }
 
 /**
