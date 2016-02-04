@@ -130,7 +130,7 @@ function custom_pub_form_alter(&$form, $form_state, $form_id) {
         '#type' => 'checkbox',
         '#title' => check_plain(t($type['name'])),
         '#default_value' => $default_value,
-        '#access' => user_access('administer nodes') ? TRUE : user_access('edit_custom_pub_' . $type['type']),
+        '#access' => user_access('administer content types') ? TRUE : user_access('edit_custom_pub_' . $type['type']),
       );
     }
 
