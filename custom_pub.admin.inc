@@ -103,9 +103,11 @@ function custom_pub_add($form, &$form_state) {
  */
 function custom_pub_add_validate($form, &$form_state) {
   $types = variable_get('custom_pub_types', array());
+
   $type = array();
   $type['type'] = trim($form_state['values']['state_machine']);
   $type['name'] = trim($form_state['values']['state']);
+
   $node = drupal_get_schema('node');
 
   if (isset($types[$type['type']])) {
@@ -134,9 +136,11 @@ function custom_pub_add_validate($form, &$form_state) {
 function custom_pub_add_submit($form, &$form_state) {
   $types = variable_get('custom_pub_types', array());
   $node_types = _node_types_build();
+
   $type = array();
   $type[trim($form_state['values']['state_machine'])]['type'] = trim($form_state['values']['state_machine']);
   $type[trim($form_state['values']['state_machine'])]['name'] = trim($form_state['values']['state']);
+
   foreach ($form_state['values']['node_types'] as $node_type => $value) {
     if (!empty($value)) {
       $type[trim($form_state['values']['state_machine'])]['node_types'][$node_type] = $node_types->types[$node_type]->name;
@@ -159,7 +163,7 @@ function custom_pub_add_submit($form, &$form_state) {
   if ($success) {
     cache_clear_all('*', 'cache', TRUE);
     variable_set('custom_pub_types', array_merge($types, $type));
-    drupal_set_message(t('Publishing option created.'));
+    drupal_set_message(t('Publishing option %option created.', array('%option' => $form_state['values']['state'])));
     $form_state['redirect'] = 'admin/structure/custom_pub';
   }
   else {
@@ -220,9 +224,10 @@ function custom_pub_edit_validate($form, &$form_state) {
   $types = variable_get('custom_pub_types', array());
   $type = $form_state['values']['type'];
   $name = trim($form_state['values']['state']);
+
   foreach ($types as $check) {
     if ($type['name'] == $check['name'] && $type['type'] != $check['type']) {
-      form_set_error('state', t("Invalid Label. That Publishing Label is already taken. Please enter a label other than %invalid.", array('%invalid' => $type['name'])));
+      form_set_error('state', t("Invalid Label. The publishing label is already taken. Please enter a label other than %invalid.", array('%invalid' => $type['name'])));
     }
   }
 }
@@ -236,6 +241,7 @@ function custom_pub_edit_submit($form, &$form_state) {
   $types = variable_get('custom_pub_types', array());
 
   if ($form_state['values']['op'] == t('Delete')) {
+    $op = t('Deleted');
     unset($types[$type['type']]);
     try {
       db_drop_field('node', $type['type']);
@@ -246,6 +252,7 @@ function custom_pub_edit_submit($form, &$form_state) {
     }
   }
   else {
+    $op = t('Edited');
     unset($types[$type['type']]['node_types']);
     foreach ($form_state['values']['node_types'] as $node_type => $value) {
       if (!empty($value)) {
@@ -259,7 +266,7 @@ function custom_pub_edit_submit($form, &$form_state) {
   if ($success) {
     cache_clear_all('*', 'cache', TRUE);
     variable_set('custom_pub_types', $types);
-    drupal_set_message(t('!op publishing option successful.', array('!op' => $form_state['values']['op'])));
+    drupal_set_message(t('!op the publishing option %name.', array('!op' => $op, '%name' => trim($form_state['values']['state']))));
   }
   else {
     drupal_set_message(t('There was an error trying to !op the publishing option. Please Try Again', array('!op' => $form_state['values']['op'])), 'error');
