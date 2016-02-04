@@ -61,6 +61,24 @@ function custom_pub_menu() {
     'description' => 'Add and remove custom publishing options from the Node form(s).',
     'file' => 'custom_pub.admin.inc',
   );
+
+  $items['admin/structure/custom_pub/list'] = array(
+    'title' => 'Overview',
+    'type' => MENU_DEFAULT_LOCAL_TASK,
+    'weight' => -10,
+  );
+
+  $items['admin/structure/custom_pub/add'] = array(
+    'title' => 'Add a publishing option',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('custom_pub_add'),
+    'access arguments' => array('administer nodes'),
+    'description' => 'Add and remove custom publishing options from the Node form(s).',
+    'file' => 'custom_pub.admin.inc',
+    'type' => MENU_LOCAL_TASK,
+    'context' => MENU_CONTEXT_PAGE | MENU_CONTEXT_INLINE,
+  );
+
   return $items;
 }
 

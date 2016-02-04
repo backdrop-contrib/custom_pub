@@ -18,16 +18,21 @@ function custom_pub_admin() {
   foreach ($types as $type) {
     // Build table rows for the
     $form_row = array();
+
     $types_of_nodes = '';
+
     if (isset($type['node_types']) && is_array($type['node_types'])) {
       $types_of_nodes = implode(', ', $type['node_types']);
     }
+
     $row = array($type['name'], $type['type'], $types_of_nodes, array('data' => '', 'class' => array('custom_pub-option-edit-cell')));
+
     $form_row[] = array(
       'data' => drupal_get_form('custom_pub_edit_' . $type['type'], $type),
       'colspan' => 4,
       'class' => array('custom_pub-form-edit'),
     );
+
     $rows[] = array('data' => $row, 'class' => array('custom_pub-option-row'));
     $rows[] = array('data' => $form_row, 'class' => array('custom_pub-form-edit'));
   }
@@ -42,13 +47,11 @@ function custom_pub_admin() {
       ),
       'rows' => $rows
     );
+
     $table = theme('table', $vars);
   }
 
-  $output = '';
-  $form = drupal_get_form('custom_pub_add');
-  $output = render($form);
-  return $table . $output;
+  return $table;
 }
 
 /**
@@ -157,6 +160,7 @@ function custom_pub_add_submit($form, &$form_state) {
     cache_clear_all('*', 'cache', TRUE);
     variable_set('custom_pub_types', array_merge($types, $type));
     drupal_set_message(t('Publishing option created.'));
+    $form_state['redirect'] = 'admin/structure/custom_pub';
   }
   else {
     drupal_set_message(t('There was an error creating your Publishing option.'), 'error');
