@@ -549,3 +549,23 @@ function custom_pub_types($rebuild = FALSE) {
 function custom_pub_types_rebuild() {
   custom_pub_types(TRUE);
 }
+
+/**
+ * Implements hook_i18n_sync_options_alter().
+ * @param $fields
+ * @param $type
+ */
+function custom_pub_i18n_sync_options_alter(&$fields, $type) {
+  // We are handling only nodes.
+  if ($type != 'node') {
+    return;
+  }
+
+  $pub_types = custom_pub_types();
+
+  foreach ($pub_types as $machine_name => $pub_type) {
+    $fields[$machine_name] = array(
+      'title' => t($pub_type['name']),
+    );
+  }
+}
