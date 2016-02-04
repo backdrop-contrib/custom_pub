@@ -423,6 +423,21 @@ function custom_pub_entity_property_info() {
 }
 
 /**
+ * Implements hook_entity_presave().
+ *
+ * hook_node_prepare() is not called when a node is created by entity_create()
+ * so use this hook to prepare nodes.
+ *
+ * @param $entity
+ * @param $type
+ */
+function custom_pub_entity_presave($entity, $type) {
+  if ($type == 'node') {
+    custom_pub_node_prepare($entity);
+  }
+}
+
+/**
  * Returns only the custom types available for the given node type.
  *
  * @param $node_type
