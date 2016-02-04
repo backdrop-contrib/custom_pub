@@ -163,6 +163,7 @@ function custom_pub_add_submit($form, &$form_state) {
   }
   catch (Exception $e) {
     $success = FALSE;
+    watchdog_exception('custom_pub', $e, NULL, WATCHDOG_ERROR);
   }
   if ($success) {
     cache_clear_all('*', 'cache', TRUE);
@@ -253,6 +254,7 @@ function custom_pub_edit_submit($form, &$form_state) {
     }
     catch (Exception $e) {
       $success = FALSE;
+      watchdog_exception('custom_pub', $e, NULL, WATCHDOG_ERROR);
     }
   }
   else {
