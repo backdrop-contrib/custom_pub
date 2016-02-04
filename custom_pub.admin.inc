@@ -10,7 +10,7 @@
 function custom_pub_admin() {
   $output = '<h3>Custom Publishing Options</h3>';
 
-  $output .= '<p>Creating/editing/deleting options requires clearing the Drupal cache before you can use them. It is advised to make as many edits here that you need, and then clear the cache to propogate the updates.</p>';
+  $output .= '<p>Creating/editing/deleting options requires clearing the Drupal cache before you can use them. It is advised to make as many edits here that you need, and then clear the cache to propogate the updates to the node system.</p>';
 
   $table = '';
 
