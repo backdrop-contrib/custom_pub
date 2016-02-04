@@ -102,6 +102,7 @@ function custom_pub_forms($form_id, $args) {
       return $forms;
     }
   }
+
   if ($form_id == 'node_admin_content') {
     module_load_include('inc', 'node', 'node.admin');
     $forms['node_admin_content'] = array(
@@ -113,6 +114,9 @@ function custom_pub_forms($form_id, $args) {
 
 /**
  * Implements hook_form_alter().
+ * @param $form
+ * @param $form_state
+ * @param $form_id
  */
 function custom_pub_form_alter(&$form, $form_state, $form_id) {
   if (isset($form['#node_edit_form']) && $form['#node_edit_form'] === TRUE) {
