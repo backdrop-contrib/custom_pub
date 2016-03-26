@@ -114,57 +114,74 @@ function custom_pub_forms($form_id, $args) {
 
 /**
  * Implements hook_form_alter().
- * @param $form
- * @param $form_state
- * @param $form_id
  */
 function custom_pub_form_alter(&$form, $form_state, $form_id) {
-//if (isset($form['#node_edit_form']) && $form['#node_edit_form'] === TRUE) {
-  if (strstr($form_id, '_node_form')) {
-    $node = $form['#node'];
-    $types = custom_pub_by_node_type($node);
-
-    foreach ($types as $type) {
-      $default_value = (isset($node->{$type['type']})) ? $node->{$type['type']} : NULL;
-
-      $form['options'][$type['type']] = array(
-        '#type' => 'checkbox',
-        '#title' => check_plain(t($type['name'])),
-        '#default_value' => $default_value,
-        '#access' => user_access('administer content types') ? TRUE : user_access('edit_custom_pub_' . $type['type']),
-      );
-    }
-
-    // set access states on core publishing options so we don't create a security issue
-    $core = array('status', 'promote', 'sticky');
-
-    foreach ($core as $core_option) {
-      if (!isset($form['options'][$core_option]['#access'])) {
-        $form['options'][$core_option]['#access'] = user_access('administer nodes') ? TRUE : FALSE;
-      }
-    }
-
-    foreach ($form['options'] as $option) {
-      if (isset($option['#access']) && $option['#access'] === TRUE) {
-        $form['options']['#access'] = TRUE;
-        break;
-      }
-    }
-  }
-
   // Add options to the node_type_form for editing default node options
   if ($form_id == 'node_type_form') {
     $node_type = $form['#node_type'];
     $types = custom_pub_by_node_type($node_type);
 
+    // Fix undocumented change notice about node_type_form
+    $options = array();
     foreach ($types as $type) {
-      $form['workflow']['node_options']['#options'][$type['type']] = check_plain(t($type['name']));
+      if (!isset($form['#node_type']->settings[$type['type'].'_default'])) {
+        $form['#node_type']->settings[$type['type'].'_default'] = 0;
+      }
+      $options[$type['type'].'_default'] = check_plain(t($type['name']));
+    }
+    $form['workflow']['node_options'] = array(
+      '#type' => 'checkboxes',
+      '#title' => t('Options'),
+      '#options' => $options,
+      '#description' => t('Custom publishing options.'),
+    );
+    foreach ($types as $type) {
+      $form['workflow']['node_options'][$type['type'].'_default'] = array(
+        '#default_value' => $form['#node_type']->settings[$type['type'].'_default'],
+        '#parents' => array($type['type'].'_default'),
+        '#return_value' => 1,
+      );
     }
   }
 
   if ($form_id == 'node_admin_content') {
     if (isset($form_state['values']['operation']) && $form_state['values']['operation'] == 'delete') {
       array_unshift($form['#submit'], 'custom_pub_node_admin_inc_add');
+    }
+  }
+}
+
+/**
+ * Implements hook_form_BASE_FORM_ID_alter().
+ */
+function custom_pub_form_node_form_alter(&$form, $form_state, $form_id) {
+  $node = $form['#node'];
+  $types = custom_pub_by_node_type($node);
+
+  foreach ($types as $type) {
+    $default_value = (isset($node->{$type['type']})) ? $node->{$type['type']} : NULL;
+
+    $form['options'][$type['type']] = array(
+      '#type' => 'checkbox',
+      '#title' => check_plain(t($type['name'])),
+      '#default_value' => $default_value,
+      '#access' => user_access('administer content types') ? TRUE : user_access('edit_custom_pub_' . $type['type']),
+    );
+  }
+
+  // set access states on core publishing options so we don't create a security issue
+  $core = array('status', 'promote', 'sticky');
+
+  foreach ($core as $core_option) {
+    if (!isset($form['options'][$core_option]['#access'])) {
+      $form['options'][$core_option]['#access'] = user_access('administer nodes') ? TRUE : FALSE;
+    }
+  }
+
+  foreach ($form['options'] as $option) {
+    if (isset($option['#access']) && $option['#access'] === TRUE) {
+      $form['options']['#access'] = TRUE;
+      break;
     }
   }
 }
