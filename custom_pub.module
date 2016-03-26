@@ -156,10 +156,16 @@ function custom_pub_form_alter(&$form, $form_state, $form_id) {
  */
 function custom_pub_form_node_form_alter(&$form, $form_state, $form_id) {
   $node = $form['#node'];
+  $node_type = node_type_load($node->type);
   $types = custom_pub_by_node_type($node);
 
   foreach ($types as $type) {
-    $default_value = (isset($node->{$type['type']})) ? $node->{$type['type']} : NULL;
+    if (!empty($node->nid)) {
+      $default_value = (isset($node->{$type['type']})) ? $node->{$type['type']} : NULL;
+    }
+    else {
+      $default_value = (!empty($node_type->settings[$type['type'].'_default'])) ? 1 : NULL;
+    }
 
     $form['options'][$type['type']] = array(
       '#type' => 'checkbox',
