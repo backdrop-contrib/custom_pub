@@ -626,7 +626,7 @@ function custom_pub_preprocess_node(&$variables) {
 
     foreach ($ids as $machine_name) {
       if (isset($node->{$machine_name}) && $node->{$machine_name}) {
-        $variables['classes_array'][] = 'node-' . $machine_name;
+        $variables['classes'][] = 'node-' . $machine_name;
       }
     }
   }
