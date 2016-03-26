@@ -18,10 +18,10 @@ function theme_custom_pub_edit_form($vars) {
   );
   $rows = array(
     array(
-      drupal_render($form['state']),
-      $type['type'] . drupal_render($form['stateh']),
-      drupal_render($form['node_types']),
-      drupal_render_children($form),
+      backdrop_render($form['state']),
+      $type['type'] . backdrop_render($form['stateh']),
+      backdrop_render($form['node_types']),
+      backdrop_render_children($form),
     ),
   );
   $title = t('Edit ' . $type['name'] . ' option');

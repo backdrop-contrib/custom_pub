@@ -91,7 +91,7 @@ function custom_pub_rules_action_set_publish_type_options() {
  * @param integer $toggled "1" for "On" and "0" for "Off".
  */
 function custom_pub_rules_action_set_publish_type($node, $type, $toggled) {
-  $types = variable_get('custom_pub_types', array());
+  $types = config_get('custom_pub.settings', 'types');
   // Check if the publishing option is applicable for this node.
   if (!empty($type) && in_array($node->type, array_keys($types[$type]['node_types']))) {
     $node->$type = (bool) $toggled;

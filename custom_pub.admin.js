@@ -1,10 +1,10 @@
 (function ($) {
   "use strict";
-  Drupal.behaviors.custom_pub_admin = {
+  Backdrop.behaviors.custom_pub_admin = {
     attach: function () {
       var toggleButtonLabels = {
-        edit: Drupal.t('Edit'),
-        close: Drupal.t('Close')
+        edit: Backdrop.t('Edit'),
+        close: Backdrop.t('Close')
       };
       $("td.custom_pub-option-edit-cell").html('<a href="#">' + toggleButtonLabels.edit + '</a>').css("text-align", "right");
       $("tr.custom_pub-form-edit").hide();

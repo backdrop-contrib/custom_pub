@@ -17,53 +17,36 @@ function custom_pub_install() {
 }
 
 /**
+ * Implements hook_enable().
+ */
+function custom_pub_enable() {
+  // Make sure a config record exists.
+  $config = config('custom_pub.settings');
+  $types = $config->get('types');
+  if (!$types) {
+    $types = array();
+    $config->set('types', $types);
+    $config->save();
+  }
+}
+
+/**
  * Implements hook_uninstall().
  */
 function custom_pub_uninstall() {
-  $types = variable_get('custom_pub_types', array());
-
+  $types = config_get('custom_pub.settings', 'types');
   foreach ($types as $type => $name) {
     db_drop_field('node', $type);
   }
-
-  variable_del('custom_pub_types');
-  variable_del('custom_pub_node_types');
+  config_uninstall_config('custom_pub.settings');
 }
 
 /**
- * Moves any existing custom publishing options over to Drupal 7.
+ * Implements hook_update_last_removed().
  */
-function custom_pub_update_7100() {
-  $types = variable_get('custom_pub_types', array());
-  $node_types = _node_types_build();
-  $node_types = array_keys($node_types);
-  $spec = array(
-    'description' => 'Custom publishing option.',
-    'type' => 'int',
-    'not null' => TRUE,
-    'default' => 0
-  );
-  foreach ($types as $type) {
-    foreach ($type['node_types'] as $n_type => $name) {
-      if (!in_array($n_type, $node_types)) {
-        unset($types[$type['type']]['node_types'][$n_type]);
-      }
-    }
-    if (!db_field_exists('node', $type['type'])) {
-      db_add_field('node', $type['type'], $spec);
-    }
-  }
-  variable_set('custom_pub_types', $types);
-}
-
-/**
- * Updates the Custom Publishing Options modules weight in the system table.
- */
-function custom_pub_update_7101() {
-  db_update('system')
-    ->fields(array(
-      'weight' => 10,
-    ))
-    ->condition('name', 'custom_pub')
-    ->execute();
+function custom_pub_update_last_removed() {
+  // We've removed the 1.x-1.x version of mymodule, including database updates.
+  // For the 1.x-2.x version of the module, the next update function would be
+  // mymodule_update_1200().
+  return 7101;
 }

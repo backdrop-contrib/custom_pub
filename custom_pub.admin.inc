@@ -10,14 +10,15 @@
 function custom_pub_admin() {
   $output = '<h3>Custom Publishing Options</h3>';
 
-  $output .= '<p>Creating/editing/deleting options requires clearing the Drupal cache before you can use them. It is advised to make as many edits here that you need, and then clear the cache to propogate the updates to the node system.</p>';
+  $output .= '<p>Creating/editing/deleting options requires clearing the Backdrop cache before you can use them. It is advised to make as many edits here that you need, and then clear the cache to propogate the updates to the node system.</p>';
 
   $table = '';
 
   //add the js for the admin page
-  drupal_add_js(drupal_get_path('module', 'custom_pub') . '/custom_pub.admin.js');
+  backdrop_add_js(backdrop_get_path('module', 'custom_pub') . '/custom_pub.admin.js');
 
-  $types = variable_get('custom_pub_types', array());//get the current custom publishing types
+  //get the current custom publishing types
+  $types = config_get('custom_pub.settings', 'types');
 
   foreach ($types as $type) {
     // Build table rows for the
@@ -32,7 +33,7 @@ function custom_pub_admin() {
     $row = array($type['name'], $type['type'], $types_of_nodes, array('data' => '', 'class' => array('custom_pub-option-edit-cell')));
 
     $form_row[] = array(
-      'data' => drupal_get_form('custom_pub_edit_' . $type['type'], $type),
+      'data' => backdrop_get_form('custom_pub_edit_' . $type['type'], $type),
       'colspan' => 4,
       'class' => array('custom_pub-form-edit'),
     );
@@ -106,13 +107,13 @@ function custom_pub_add($form, &$form_state) {
  * @param $form_state
  */
 function custom_pub_add_validate($form, &$form_state) {
-  $types = variable_get('custom_pub_types', array());
+  $types = config_get('custom_pub.settings', 'types');
 
   $type = array();
   $type['type'] = trim($form_state['values']['state_machine']);
   $type['name'] = trim($form_state['values']['state']);
 
-  $node = drupal_get_schema('node');
+  $node = backdrop_get_schema('node');
 
   if (isset($types[$type['type']])) {
     form_set_error('state_machine', t('The machine-readable name %type is already taken.', array('%type' => $type->type)));
@@ -138,7 +139,7 @@ function custom_pub_add_validate($form, &$form_state) {
  * @param $form_state
  */
 function custom_pub_add_submit($form, &$form_state) {
-  $types = variable_get('custom_pub_types', array());
+  $types = config_get('custom_pub.settings', 'types');
   $node_types = _node_types_build();
 
   $type = array();
@@ -167,12 +168,12 @@ function custom_pub_add_submit($form, &$form_state) {
   }
   if ($success) {
     cache_clear_all('*', 'cache', TRUE);
-    variable_set('custom_pub_types', array_merge($types, $type));
-    drupal_set_message(t('Publishing option %option created.', array('%option' => $form_state['values']['state'])));
+    config_set('custom_pub.settings', 'types', array_merge($types, $type));
+    backdrop_set_message(t('Publishing option %option created.', array('%option' => $form_state['values']['state'])));
     $form_state['redirect'] = 'admin/structure/custom_pub';
   }
   else {
-    drupal_set_message(t('There was an error creating your Publishing option.'), 'error');
+    backdrop_set_message(t('There was an error creating your Publishing option.'), 'error');
   }
 }
 
@@ -226,7 +227,7 @@ function custom_pub_edit($form, &$form_state, $type) {
  * @param $form_state
  */
 function custom_pub_edit_validate($form, &$form_state) {
-  $types = variable_get('custom_pub_types', array());
+  $types = config_get('custom_pub.settings', 'types');
   $type = $form_state['values']['type'];
   $name = trim($form_state['values']['state']);
 
@@ -243,7 +244,7 @@ function custom_pub_edit_validate($form, &$form_state) {
 function custom_pub_edit_submit($form, &$form_state) {
   $node_types = _node_types_build();
   $type = $form_state['values']['type'];
-  $types = variable_get('custom_pub_types', array());
+  $types = config_get('custom_pub.settings', 'types');
 
   if ($form_state['values']['op'] == t('Delete')) {
     $op = t('Deleted');
@@ -271,11 +272,11 @@ function custom_pub_edit_submit($form, &$form_state) {
   }
   if ($success) {
     cache_clear_all('*', 'cache', TRUE);
-    variable_set('custom_pub_types', $types);
-    drupal_set_message(t('!op the publishing option %name.', array('!op' => $op, '%name' => trim($form_state['values']['state']))));
+    config_set('custom_pub.settings', 'types', $types);
+    backdrop_set_message(t('!op the publishing option %name.', array('!op' => $op, '%name' => trim($form_state['values']['state']))));
   }
   else {
-    drupal_set_message(t('There was an error trying to !op the publishing option. Please Try Again', array('!op' => $form_state['values']['op'])), 'error');
+    backdrop_set_message(t('There was an error trying to !op the publishing option. Please Try Again', array('!op' => $form_state['values']['op'])), 'error');
   }
 }
 
@@ -309,12 +310,12 @@ function custom_pub_node_admin_content($form, $form_state) {
  * Return the form for node administration filters.
  *
  * The main difference between this function and the base function is the
- * drupal_alter() call after node_filters().
+ * backdrop_alter() call after node_filters().
  */
 function custom_pub_node_filter_form() {
   $session = isset($_SESSION['node_overview_filter']) ? $_SESSION['node_overview_filter'] : array();
   $filters = node_filters();
-  drupal_alter('node_filters', $filters);
+  backdrop_alter('node_filters', $filters);
 
   $i = 0;
   $form['filters'] = array(
@@ -377,7 +378,7 @@ function custom_pub_node_filter_form() {
     $form['filters']['status']['actions']['reset'] = array('#type' => 'submit', '#value' => t('Reset'));
   }
 
-  drupal_add_js('misc/form.js');
+  backdrop_add_js('misc/form.js');
 
   return $form;
 }
@@ -386,7 +387,7 @@ function custom_pub_node_filter_form() {
  * Form submit function for the content administration form.
  */
 function custom_pub_node_filter_form_submit($form, $form_state) {
-  $types = variable_get('custom_pub_types', array());
+  $types = config_get('custom_pub.settings', 'types');
   $filters = node_filters();
   switch ($form_state['values']['op']) {
     case t('Filter'):
@@ -421,7 +422,7 @@ function custom_pub_node_filter_form_submit($form, $form_state) {
  * Implements hook_node_filters_alter().
  */
 function custom_pub_node_filters_alter(&$filters) {
-  $types = variable_get('custom_pub_types', array());
+  $types = config_get('custom_pub.settings', 'types');
   foreach ($types as $type) {
     $filters['status']['options'][$type['type'] . '-1'] = t($type['name']);
     $filters['status']['options'][$type['type'] . '-0'] = t('not ' . $type['name']);
