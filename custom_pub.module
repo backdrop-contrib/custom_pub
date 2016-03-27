@@ -32,9 +32,42 @@ function custom_pub_permission() {
     $permissions[$key] = array(
       'title' => 'Can access/use ' . t('%type', array('%type' => $type['type'])) . ' custom publishing option on node forms'
     );
+    $key = 'view_custom_pub_' . $type['type'];
+    $permissions[$key] = array(
+      'title' => 'Can view ' . t('%type', array('%type' => $type['type'])) . ' nodes'
+    );
   }
 
   return $permissions;
+}
+
+/**
+ * Implements hook_node_access().
+ */
+function custom_pub_node_access($node, $op, $account) {
+  if (!is_object($node) || $op != "view") {
+    return NODE_ACCESS_IGNORE;
+  }
+  $types = variable_get('custom_pub_types', array());
+
+  foreach ($types as $type) {
+    if (!isset($node->{$type['type']})) {
+      continue;
+    }
+    if (!empty($node->{$type['type']})) {
+      $key = 'view_custom_pub_' . $type['type'];
+      if (user_access($key, $account)) {
+        return NODE_ACCESS_ALLOW;
+      }
+      // alternative, "negative", way
+    /*if (!user_access($key, $account)) {
+        return NODE_ACCESS_DENY;
+      }*/
+    }
+  }
+
+  // Returning nothing from this function would have the same effect.
+  return NODE_ACCESS_IGNORE;
 }
 
 /**
