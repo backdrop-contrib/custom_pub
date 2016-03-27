@@ -231,6 +231,10 @@ function custom_pub_views_data_alter(&$data) {
  */
 function custom_pub_schema_alter(&$schema) {
   $types = config_get('custom_pub.settings', 'types');
+  if (!is_array($types)) {
+    // first bootstrap after install
+    $types = array();
+  }
   foreach ($types as $type) {
     $schema['node']['fields'][$type['type']] = array(
       'description' => t('Custom publishing option @name', array('@name' => $type['name'])),
