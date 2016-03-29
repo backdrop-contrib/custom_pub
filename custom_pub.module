@@ -48,7 +48,7 @@ function custom_pub_node_access($node, $op, $account) {
   if (!is_object($node) || $op != "view") {
     return NODE_ACCESS_IGNORE;
   }
-  $types = variable_get('custom_pub_types', array());
+  $types = config_get('custom_pub.settings', 'types');
 
   foreach ($types as $type) {
     if (!isset($node->{$type['type']})) {
